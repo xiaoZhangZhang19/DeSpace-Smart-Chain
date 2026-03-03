@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  ShieldCheck, 
-  Database, 
-  Users, 
-  Vote, 
-  TrendingUp, 
-  Lock, 
-  Eye, 
-  ArrowRight, 
-  Building2, 
-  Cpu, 
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import {
+  ShieldCheck,
+  Database,
+  Users,
+  Vote,
+  TrendingUp,
+  Lock,
+  Eye,
+  ArrowRight,
+  Building2,
+  Cpu,
   Compass,
   Globe,
   Menu,
@@ -25,6 +26,8 @@ import {
   Server
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import ContractTemplates from './pages/ContractTemplates';
+import ContractIDE from './pages/ContractIDE';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -345,9 +348,10 @@ const TrustCrisis = () => {
 };
 
 const DeveloperTools = () => {
+  const navigate = useNavigate();
   const tools = [
-    { title: '标准合约模板', desc: '内置 ERC-20 (DSCToken) 与 ERC-721 (DSCNFT) 模板，开箱即用。', icon: FileCode, tag: 'v1.2' },
-    { title: '多语言 SDK', desc: '提供 Java, Go, Python, JS 等多语言 SDK，快速集成业务系统。', icon: Terminal, tag: 'STABLE' },
+    { title: '标准合约模板', desc: '内置 ERC-20 (DSCToken) 与 ERC-721 (DSCNFT) 模板，开箱即用。', icon: FileCode, tag: 'v1.2', route: '/contracts' },
+    { title: '在线合约 IDE', desc: '浏览器端 Solidity 编辑器，语法高亮 · 一键编译 · 生成 ABI，无需本地环境。', icon: Terminal, tag: 'ONLINE', route: '/ide' },
     { title: 'BaaS 管理平台', desc: '一站式节点管理、合约部署与数据看板，降低运维门槛。', icon: LayoutDashboard, tag: 'CLOUD', url: 'http://121.196.226.157:5000/#/login' },
     { title: '区块浏览器', desc: '专业版 Web 端与简化版小程序内嵌，全方位透明监督。', icon: SearchCode, tag: 'LIVE', url: 'http://8.137.93.11:5100/#/home' },
   ];
@@ -396,12 +400,15 @@ const DeveloperTools = () => {
           className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
         >
           {tools.map((tool, i) => (
-            <motion.div 
+            <motion.div
               key={i}
               variants={item}
               whileHover={{ y: -10, scale: 1.02 }}
-              onClick={() => tool.url && window.open(tool.url, '_blank')}
-              className={`glass-card p-8 border-white/5 hover:border-brand-primary/40 transition-all group relative overflow-hidden cyber-border ${tool.url ? 'cursor-pointer' : ''}`}
+              onClick={() => {
+                if (tool.route) navigate(tool.route);
+                else if (tool.url) window.open(tool.url, '_blank');
+              }}
+              className={`glass-card p-8 border-white/5 hover:border-brand-primary/40 transition-all group relative overflow-hidden cyber-border ${tool.route || tool.url ? 'cursor-pointer' : ''}`}
             >
               <div className="absolute top-0 right-0 p-4">
                 <span className="text-[8px] font-mono text-slate-600 border border-white/5 px-2 py-0.5 rounded-sm">{tool.tag}</span>
@@ -986,20 +993,28 @@ const BlockchainBackground = () => {
   );
 };
 
+const HomePage = () => (
+  <div className="min-h-screen font-sans selection:bg-brand-primary selection:text-brand-secondary relative">
+    <BlockchainBackground />
+    <div className="relative z-10">
+      <Navbar />
+      <Hero />
+      <DeveloperTools />
+      <CodePreview />
+      <TrustCrisis />
+      <TechnicalAdvantages />
+      <Solutions />
+      <Footer />
+    </div>
+  </div>
+);
+
 export default function App() {
   return (
-    <div className="min-h-screen font-sans selection:bg-brand-primary selection:text-brand-secondary relative">
-      <BlockchainBackground />
-      <div className="relative z-10">
-        <Navbar />
-        <Hero />
-        <DeveloperTools />
-        <CodePreview />
-        <TrustCrisis />
-        <TechnicalAdvantages />
-        <Solutions />
-        <Footer />
-      </div>
-    </div>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/contracts" element={<ContractTemplates />} />
+      <Route path="/ide"       element={<ContractIDE />} />
+    </Routes>
   );
 }
