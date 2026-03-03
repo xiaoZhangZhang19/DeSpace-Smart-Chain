@@ -138,72 +138,102 @@ const Hero = () => {
             transition={{ duration: 1, delay: 0.2 }}
             className="relative hidden lg:block"
           >
-            <div className="relative z-10 glass-card p-12 aspect-square flex items-center justify-center cyber-border">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,156,0.1),transparent_70%)]" />
+            <div className="relative z-10 glass-card p-16 aspect-square flex items-center justify-center cyber-border overflow-visible">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,156,0.05),transparent_70%)]" />
               
               {/* Technical HUD elements */}
-              <div className="absolute top-6 left-6 hud-label flex items-center gap-2">
+              <div className="absolute top-8 left-8 hud-label flex items-center gap-2">
                 <Activity size={12} className="text-brand-primary" />
                 <span>SYSTEM.CORE.ACTIVE</span>
               </div>
-              <div className="absolute top-6 right-6 hud-label">
+              <div className="absolute top-8 right-8 hud-label">
                 v2.0.4-STABLE
               </div>
-              <div className="absolute bottom-6 left-6 hud-label flex flex-col gap-1">
+              <div className="absolute bottom-8 left-8 hud-label flex flex-col gap-1">
                 <span>LATENCY: 12ms</span>
                 <span>UPTIME: 99.99%</span>
               </div>
 
-              <div className="grid grid-cols-4 gap-4 w-full h-full opacity-50">
-                {[...Array(16)].map((_, i) => (
+              {/* Background Grid */}
+              <div className="grid grid-cols-6 gap-2 w-full h-full opacity-20">
+                {[...Array(36)].map((_, i) => (
                   <motion.div 
                     key={i}
                     animate={{ 
-                      opacity: [0.1, 0.4, 0.1],
-                      backgroundColor: i % 5 === 0 ? 'rgba(0,255,156,0.2)' : 'rgba(255,255,255,0.02)'
+                      opacity: [0.05, 0.2, 0.05],
                     }}
                     transition={{ 
                       duration: 4, 
                       repeat: Infinity, 
-                      delay: i * 0.1 
+                      delay: i * 0.05 
                     }}
-                    className="border border-white/5 rounded-sm"
+                    className="border border-white/10 rounded-sm"
                   />
                 ))}
               </div>
 
-              {/* Central Visual */}
+              {/* Central Visual - Enhanced */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="relative">
                   <motion.div 
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    className="w-48 h-48 border border-brand-primary/20 rounded-full border-dashed"
+                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                    className="w-64 h-64 border border-brand-primary/10 rounded-full border-dashed"
                   />
                   <motion.div 
                     animate={{ rotate: -360 }}
-                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                    className="absolute inset-0 w-48 h-48 border border-brand-accent/20 rounded-full border-dashed scale-110"
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    className="absolute inset-0 w-64 h-64 border border-brand-accent/10 rounded-full border-dashed scale-125"
+                  />
+                  <motion.div 
+                    animate={{ 
+                      scale: [1, 1.1, 1],
+                      opacity: [0.3, 0.6, 0.3]
+                    }}
+                    transition={{ duration: 4, repeat: Infinity }}
+                    className="absolute inset-0 w-64 h-64 bg-brand-primary/5 rounded-full blur-2xl"
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <Database size={48} className="text-brand-primary glow-primary" />
+                    <div className="relative group">
+                      <div className="absolute -inset-4 bg-brand-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <Database size={64} className="text-brand-primary glow-primary relative z-10" />
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Floating Data Nodes */}
-              <div className="absolute -top-6 -right-6 bg-brand-surface border border-white/10 p-5 rounded-sm shadow-2xl cyber-border">
+              {/* Floating Data Nodes - Fixed Positioning to prevent overlapping */}
+              <motion.div 
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -top-4 -right-12 bg-brand-surface/90 backdrop-blur-xl border border-white/10 p-6 rounded-sm shadow-2xl cyber-border z-20 min-w-[160px]"
+              >
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-2 h-2 bg-brand-primary rounded-full animate-ping" />
                   <span className="hud-label">NETWORK LOAD</span>
                 </div>
-                <div className="text-2xl font-mono text-white">0.042%</div>
-              </div>
+                <div className="text-3xl font-mono text-white tracking-tighter">0.042%</div>
+                <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                  <motion.div 
+                    animate={{ width: ['40%', '45%', '42%'] }}
+                    className="h-full bg-brand-primary" 
+                  />
+                </div>
+              </motion.div>
               
-              <div className="absolute -bottom-6 -left-6 bg-brand-surface border border-white/10 p-5 rounded-sm shadow-2xl cyber-border">
+              <motion.div 
+                animate={{ y: [0, 10, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                className="absolute -bottom-4 -left-12 bg-brand-surface/90 backdrop-blur-xl border border-white/10 p-6 rounded-sm shadow-2xl cyber-border z-20 min-w-[160px]"
+              >
                 <span className="hud-label block mb-2">BLOCK HEIGHT</span>
-                <div className="text-2xl font-mono text-brand-accent">#8,492,102</div>
-              </div>
+                <div className="text-3xl font-mono text-brand-accent tracking-tighter">#8,492,102</div>
+                <div className="mt-2 flex gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className={`h-1 flex-1 rounded-full ${i < 4 ? 'bg-brand-accent' : 'bg-white/10'}`} />
+                  ))}
+                </div>
+              </motion.div>
             </div>
           </motion.div>
         </div>
