@@ -348,7 +348,7 @@ const DeveloperTools = () => {
   const tools = [
     { title: '标准合约模板', desc: '内置 ERC-20 (DSCToken) 与 ERC-721 (DSCNFT) 模板，开箱即用。', icon: FileCode, tag: 'v1.2' },
     { title: '多语言 SDK', desc: '提供 Java, Go, Python, JS 等多语言 SDK，快速集成业务系统。', icon: Terminal, tag: 'STABLE' },
-    { title: 'BaaS 管理平台', desc: '一站式节点管理、合约部署与数据看板，降低运维门槛。', icon: LayoutDashboard, tag: 'CLOUD' },
+    { title: 'BaaS 管理平台', desc: '一站式节点管理、合约部署与数据看板，降低运维门槛。', icon: LayoutDashboard, tag: 'CLOUD', url: 'http://121.196.226.157:5000/#/login' },
     { title: '区块浏览器', desc: '专业版 Web 端与简化版小程序内嵌，全方位透明监督。', icon: SearchCode, tag: 'LIVE', url: 'http://8.137.93.11:5100/#/home' },
   ];
 
@@ -632,7 +632,7 @@ const Solutions = () => {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
-          className="grid lg:grid-cols-3 gap-10 mb-20"
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-10 mb-20"
         >
           {[
             { 
@@ -652,6 +652,18 @@ const Solutions = () => {
               icon: TrendingUp, 
               color: 'brand-primary',
               items: ['行为挖矿：垃圾分类、按时缴费即可获得链上积分。', '权益兑换：积分可抵扣物业费或兑换周边商户服务。']
+            },
+            { 
+              title: '资产确权', 
+              icon: ShieldCheck, 
+              color: 'brand-accent',
+              items: ['空间确权：对社区公共空间、共有设施进行链上登记，明确产权归属。', '权益存证：业主委员会决议、物业合同等核心权益文件上链，确立法律效力。']
+            },
+            { 
+              title: '数据资产', 
+              icon: Layers, 
+              color: 'brand-primary',
+              items: ['数据资产化：将社区运营数据转化为可信资产，为物业融资提供信用背书。', 'RWA 映射：对接 AssetX 平台，实现物理资产与数字资产的 1:1 映射与流转。']
             }
           ].map((solution, i) => (
             <motion.div key={i} variants={item} className="relative group">
