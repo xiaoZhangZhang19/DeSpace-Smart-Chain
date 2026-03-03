@@ -1,0 +1,10 @@
+{
+  "buildCommand": "vite build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/api/users",   "destination": "/api/users" },
+    { "source": "/api/compile", "destination": "/api/compile" },
+    { "source": "/api/deploy",  "destination": "/api/deploy" },
+    { "source": "/(.*)",        "destination": "/index.html" }
+  ]
+}

@@ -20,10 +20,21 @@ export default defineConfig(({mode}) => {
       // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',
       proxy: {
-        '/webase': {
+        // 本地开发：/api/* 直接代理到 WeBASE-Front（生产环境由 Vercel Functions 处理）
+        '/api/users': {
           target: 'http://8.137.93.11:5002',
           changeOrigin: true,
-          rewrite: (path: string) => path.replace(/^\/webase/, '/WeBASE-Front'),
+          rewrite: () => '/WeBASE-Front/privateKey/localKeyStores',
+        },
+        '/api/compile': {
+          target: 'http://8.137.93.11:5002',
+          changeOrigin: true,
+          rewrite: () => '/WeBASE-Front/contract/contractCompile',
+        },
+        '/api/deploy': {
+          target: 'http://8.137.93.11:5002',
+          changeOrigin: true,
+          rewrite: () => '/WeBASE-Front/contract/deploy',
         },
       },
     },

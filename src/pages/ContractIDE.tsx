@@ -543,7 +543,7 @@ export default function ContractIDE() {
     setDeployError('');
     try {
       // 文档接口：GET /privateKey/localKeyStores → 返回本地密钥数组
-      const r = await fetch('/webase/privateKey/localKeyStores');
+      const r = await fetch('/api/users');
       const body = await r.json().catch(() => null);
       if (!r.ok) throw new Error(`HTTP ${r.status}: ${body?.message ?? r.statusText}`);
 
@@ -574,7 +574,7 @@ export default function ContractIDE() {
     const funcParam = ctor && ctor.inputs.length > 0 ? ctor.inputs.map(() => '') : [];
 
     setDeployState('deploying');
-    const deployRes = await fetch('/webase/contract/deploy', {
+    const deployRes = await fetch('/api/deploy', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -622,7 +622,7 @@ export default function ContractIDE() {
       bytes.forEach(b => { binary += String.fromCharCode(b); });
       const solidityBase64 = btoa(binary);
 
-      const compileRes = await fetch('/webase/contract/contractCompile', {
+      const compileRes = await fetch('/api/compile', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contractName: CONTRACT_NAME, solidityBase64 }),
