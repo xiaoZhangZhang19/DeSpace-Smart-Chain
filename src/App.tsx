@@ -10,6 +10,7 @@ import {
   ArrowRight, 
   Building2, 
   Cpu, 
+  Compass,
   Globe,
   Menu,
   X,
@@ -51,17 +52,26 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Desktop Menu */}
+        {/* Desktop Menu - System Status Indicators */}
         <div className="hidden md:flex items-center gap-10">
-          {['VISION', 'DEVELOPERS', 'TECHNOLOGY', 'SOLUTIONS'].map((item) => (
-            <a key={item} href={`#${item.toLowerCase()}`} className="hud-label text-slate-400 hover:text-brand-primary transition-colors relative group">
-              {item}
-              <span className="absolute -bottom-1 left-0 w-0 h-px bg-brand-primary transition-all group-hover:w-full" />
-            </a>
+          {[
+            { label: 'TPS', value: '20,000+' },
+            { label: 'NODES', value: '1,024' },
+            { label: 'LATENCY', value: '12ms' },
+            { label: 'SECURITY', value: 'BFT' }
+          ].map((stat) => (
+            <div key={stat.label} className="flex flex-col items-start group cursor-default">
+              <span className="text-[8px] text-brand-primary/50 font-bold tracking-[0.2em] uppercase group-hover:text-brand-primary transition-colors">{stat.label}</span>
+              <span className="text-[10px] text-white/80 font-mono font-medium tracking-tight group-hover:text-white transition-colors">{stat.value}</span>
+              <div className="w-full h-[1px] bg-brand-primary/10 mt-1 overflow-hidden">
+                <motion.div 
+                  animate={{ x: ['-100%', '100%'] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                  className="w-1/2 h-full bg-brand-primary/40"
+                />
+              </div>
+            </div>
           ))}
-          <button className="px-6 py-2 rounded-sm border border-brand-primary/50 bg-brand-primary/10 text-brand-primary text-[10px] font-bold uppercase tracking-widest hover:bg-brand-primary hover:text-brand-secondary transition-all glow-primary">
-            LAUNCH CONSOLE
-          </button>
         </div>
 
         {/* Mobile Toggle */}
@@ -79,15 +89,20 @@ const Navbar = () => {
             exit={{ opacity: 0, y: -20 }}
             className="absolute top-full left-0 right-0 bg-brand-secondary border-b border-white/10 p-6 md:hidden"
           >
-            <div className="flex flex-col gap-4">
-              {['VISION', 'TECHNOLOGY', 'SOLUTIONS', 'ECOSYSTEM'].map((item) => (
-                <a key={item} href={`#${item.toLowerCase()}`} className="text-lg text-slate-400 hover:text-brand-primary" onClick={() => setIsMobileMenuOpen(false)}>
-                  {item}
-                </a>
-              ))}
-              <button className="w-full py-3 rounded-xl bg-brand-primary text-brand-secondary font-bold uppercase tracking-widest">
-                LAUNCH CONSOLE
-              </button>
+            <div className="flex flex-col gap-6">
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label: 'TPS', value: '20,000+' },
+                  { label: 'NODES', value: '1,024' },
+                  { label: 'LATENCY', value: '12ms' },
+                  { label: 'SECURITY', value: 'BFT' }
+                ].map((stat) => (
+                  <div key={stat.label} className="p-3 bg-white/5 border border-white/10 rounded-sm">
+                    <span className="block text-[8px] text-brand-primary/50 font-bold tracking-widest uppercase mb-1">{stat.label}</span>
+                    <span className="text-lg font-mono text-white">{stat.value}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </motion.div>
         )}
@@ -179,11 +194,11 @@ const UrbanDigitalTwin = () => {
           className="absolute top-0 right-0 glass-card p-4 cyber-border min-w-[180px]"
         >
           <div className="flex items-center gap-2 mb-2">
-            <Building2 size={14} className="text-brand-primary" />
-            <span className="hud-label">URBAN ASSETS</span>
+            <Compass size={14} className="text-brand-primary" />
+            <span className="hud-label">PRODUCT POSITIONING</span>
           </div>
-          <div className="text-2xl font-mono text-white">1,240,892 <span className="text-[10px] text-brand-primary">M²</span></div>
-          <div className="mt-2 text-[9px] text-slate-500 uppercase tracking-widest">Verified on DSC</div>
+          <div className="text-xl font-mono text-white tracking-tight">TRUST BASE</div>
+          <div className="mt-2 text-[9px] text-slate-500 uppercase tracking-widest font-sans">城市空间资产公信力底座</div>
         </motion.div>
 
         <motion.div 
@@ -193,21 +208,11 @@ const UrbanDigitalTwin = () => {
           className="absolute bottom-10 left-0 glass-card p-4 cyber-border min-w-[180px]"
         >
           <div className="flex items-center gap-2 mb-2">
-            <ShieldCheck size={14} className="text-brand-accent" />
-            <span className="hud-label">TRUST INDEX</span>
+            <Cpu size={14} className="text-brand-accent" />
+            <span className="hud-label">TECHNICAL ROUTE</span>
           </div>
-          <div className="text-2xl font-mono text-brand-accent">99.98<span className="text-[10px]">%</span></div>
-          <div className="mt-2 flex gap-1">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="h-1 flex-1 bg-brand-accent/20 rounded-full overflow-hidden">
-                <motion.div 
-                  animate={{ opacity: [0.3, 1, 0.3] }}
-                  transition={{ duration: 2, repeat: Infinity, delay: i * 0.2 }}
-                  className="h-full bg-brand-accent"
-                />
-              </div>
-            ))}
-          </div>
+          <div className="text-xl font-mono text-brand-accent tracking-tight">FISCO BCOS</div>
+          <div className="mt-2 text-[9px] text-slate-500 uppercase tracking-widest font-sans">合规联盟链基础设施</div>
         </motion.div>
 
         {/* Scanning Line */}
@@ -344,7 +349,7 @@ const DeveloperTools = () => {
     { title: '标准合约模板', desc: '内置 ERC-20 (DSCToken) 与 ERC-721 (DSCNFT) 模板，开箱即用。', icon: FileCode, tag: 'v1.2' },
     { title: '多语言 SDK', desc: '提供 Java, Go, Python, JS 等多语言 SDK，快速集成业务系统。', icon: Terminal, tag: 'STABLE' },
     { title: 'BaaS 管理平台', desc: '一站式节点管理、合约部署与数据看板，降低运维门槛。', icon: LayoutDashboard, tag: 'CLOUD' },
-    { title: '区块浏览器', desc: '专业版 Web 端与简化版小程序内嵌，全方位透明监督。', icon: SearchCode, tag: 'LIVE' },
+    { title: '区块浏览器', desc: '专业版 Web 端与简化版小程序内嵌，全方位透明监督。', icon: SearchCode, tag: 'LIVE', url: 'http://8.137.93.11:5100/#/home' },
   ];
 
   const container = {
@@ -395,7 +400,8 @@ const DeveloperTools = () => {
               key={i}
               variants={item}
               whileHover={{ y: -10, scale: 1.02 }}
-              className="glass-card p-8 border-white/5 hover:border-brand-primary/40 transition-all group relative overflow-hidden cyber-border"
+              onClick={() => tool.url && window.open(tool.url, '_blank')}
+              className={`glass-card p-8 border-white/5 hover:border-brand-primary/40 transition-all group relative overflow-hidden cyber-border ${tool.url ? 'cursor-pointer' : ''}`}
             >
               <div className="absolute top-0 right-0 p-4">
                 <span className="text-[8px] font-mono text-slate-600 border border-white/5 px-2 py-0.5 rounded-sm">{tool.tag}</span>
