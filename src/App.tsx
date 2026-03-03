@@ -36,7 +36,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'bg-brand-secondary/90 backdrop-blur-md border-b border-white/5 py-3' : 'bg-transparent py-6'}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'bg-brand-secondary/90 backdrop-blur-md border-b border-white/5 py-3' : 'bg-brand-secondary/40 backdrop-blur-sm py-6'}`}>
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         <div className="flex items-center gap-3 group cursor-pointer">
           <div className="relative">
@@ -96,16 +96,146 @@ const Navbar = () => {
   );
 };
 
+const UrbanDigitalTwin = () => {
+  return (
+    <div className="relative w-full aspect-square flex items-center justify-center overflow-visible">
+      {/* Perspective Container */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="w-[140%] h-[140%] opacity-20" 
+             style={{ 
+               backgroundImage: 'radial-gradient(circle at center, rgba(0,255,156,0.2) 0%, transparent 70%)',
+               transform: 'perspective(1000px) rotateX(60deg) rotateZ(-45deg)' 
+             }} 
+        />
+      </div>
+
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.8, rotateX: 60, rotateZ: -45 }}
+        animate={{ opacity: 1, scale: 1, rotateX: 60, rotateZ: -45 }}
+        transition={{ duration: 1.5, ease: "easeOut" }}
+        className="relative w-full h-full"
+        style={{ transformStyle: 'preserve-3d' }}
+      >
+        {/* Base Grid */}
+        <div className="absolute inset-0 grid grid-cols-8 grid-rows-8 border border-white/5">
+          {[...Array(64)].map((_, i) => (
+            <div key={i} className="border border-white/5" />
+          ))}
+        </div>
+
+        {/* City Assets (Buildings) */}
+        {[
+          { x: 2, y: 2, h: 80, color: 'brand-primary' },
+          { x: 5, y: 1, h: 40, color: 'brand-accent' },
+          { x: 1, y: 5, h: 60, color: 'brand-primary' },
+          { x: 4, y: 4, h: 120, color: 'brand-primary' },
+          { x: 6, y: 6, h: 50, color: 'brand-accent' },
+          { x: 2, y: 6, h: 30, color: 'brand-primary' },
+        ].map((building, i) => (
+          <motion.div
+            key={i}
+            initial={{ height: 0 }}
+            animate={{ height: building.h }}
+            transition={{ duration: 1, delay: 0.5 + i * 0.1 }}
+            className={`absolute bg-${building.color}/20 border border-${building.color}/40 backdrop-blur-sm`}
+            style={{
+              width: '12.5%',
+              left: `${building.x * 12.5}%`,
+              top: `${building.y * 12.5}%`,
+              transform: 'translateZ(0)',
+              transformStyle: 'preserve-3d',
+              boxShadow: `0 0 20px rgba(var(--${building.color}-rgb), 0.1)`
+            }}
+          >
+            {/* Top Face */}
+            <div className={`absolute top-0 left-0 w-full h-full bg-${building.color}/40`} 
+                 style={{ transform: `translateZ(${building.h}px)` }} />
+          </motion.div>
+        ))}
+
+        {/* Data Streams */}
+        {[...Array(4)].map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{ offset: 0 }}
+            animate={{ offset: [0, 1] }}
+            transition={{ duration: 3, repeat: Infinity, delay: i * 0.7, ease: "linear" }}
+            className="absolute h-px bg-gradient-to-r from-transparent via-brand-primary to-transparent z-50"
+            style={{
+              width: '100%',
+              top: `${(i + 2) * 20}%`,
+              opacity: 0.5,
+            }}
+          />
+        ))}
+      </motion.div>
+
+      {/* Floating HUD Overlays */}
+      <div className="absolute inset-0 pointer-events-none">
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 1.2 }}
+          className="absolute top-0 right-0 glass-card p-4 cyber-border min-w-[180px]"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <Building2 size={14} className="text-brand-primary" />
+            <span className="hud-label">URBAN ASSETS</span>
+          </div>
+          <div className="text-2xl font-mono text-white">1,240,892 <span className="text-[10px] text-brand-primary">M²</span></div>
+          <div className="mt-2 text-[9px] text-slate-500 uppercase tracking-widest">Verified on DSC</div>
+        </motion.div>
+
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 1.4 }}
+          className="absolute bottom-10 left-0 glass-card p-4 cyber-border min-w-[180px]"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <ShieldCheck size={14} className="text-brand-accent" />
+            <span className="hud-label">TRUST INDEX</span>
+          </div>
+          <div className="text-2xl font-mono text-brand-accent">99.98<span className="text-[10px]">%</span></div>
+          <div className="mt-2 flex gap-1">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="h-1 flex-1 bg-brand-accent/20 rounded-full overflow-hidden">
+                <motion.div 
+                  animate={{ opacity: [0.3, 1, 0.3] }}
+                  transition={{ duration: 2, repeat: Infinity, delay: i * 0.2 }}
+                  className="h-full bg-brand-accent"
+                />
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Scanning Line */}
+        <motion.div 
+          animate={{ top: ['0%', '100%', '0%'] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+          className="absolute left-0 right-0 h-[2px] bg-brand-primary/20 blur-sm z-10"
+        />
+      </div>
+    </div>
+  );
+};
+
 const Hero = () => {
   return (
-    <section id="vision" className="relative pt-32 pb-20 overflow-hidden grid-background min-h-screen flex items-center">
+    <section id="vision" className="relative pb-20 overflow-hidden grid-background min-h-screen flex flex-col">
+      {/* Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-brand-secondary via-transparent to-brand-secondary pointer-events-none" />
       <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-brand-primary/5 blur-[120px] rounded-full animate-pulse" />
       <div className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] bg-brand-accent/5 blur-[120px] rounded-full animate-pulse" />
       <div className="scanline" />
+
+      {/* Navbar Spacer */}
+      <div className="h-32 md:h-40 w-full shrink-0" />
       
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+      <div className="flex-1 flex items-start py-12 md:py-20">
+        <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -138,107 +268,12 @@ const Hero = () => {
             transition={{ duration: 1, delay: 0.2 }}
             className="relative hidden lg:block"
           >
-            <div className="relative z-10 glass-card p-16 aspect-square flex items-center justify-center cyber-border overflow-visible">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,156,0.05),transparent_70%)]" />
-              
-              {/* Technical HUD elements */}
-              <div className="absolute top-8 left-8 hud-label flex items-center gap-2">
-                <Activity size={12} className="text-brand-primary" />
-                <span>SYSTEM.CORE.ACTIVE</span>
-              </div>
-              <div className="absolute top-8 right-8 hud-label">
-                v2.0.4-STABLE
-              </div>
-              <div className="absolute bottom-8 left-8 hud-label flex flex-col gap-1">
-                <span>LATENCY: 12ms</span>
-                <span>UPTIME: 99.99%</span>
-              </div>
-
-              {/* Background Grid */}
-              <div className="grid grid-cols-6 gap-2 w-full h-full opacity-20">
-                {[...Array(36)].map((_, i) => (
-                  <motion.div 
-                    key={i}
-                    animate={{ 
-                      opacity: [0.05, 0.2, 0.05],
-                    }}
-                    transition={{ 
-                      duration: 4, 
-                      repeat: Infinity, 
-                      delay: i * 0.05 
-                    }}
-                    className="border border-white/10 rounded-sm"
-                  />
-                ))}
-              </div>
-
-              {/* Central Visual - Enhanced */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative">
-                  <motion.div 
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                    className="w-64 h-64 border border-brand-primary/10 rounded-full border-dashed"
-                  />
-                  <motion.div 
-                    animate={{ rotate: -360 }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    className="absolute inset-0 w-64 h-64 border border-brand-accent/10 rounded-full border-dashed scale-125"
-                  />
-                  <motion.div 
-                    animate={{ 
-                      scale: [1, 1.1, 1],
-                      opacity: [0.3, 0.6, 0.3]
-                    }}
-                    transition={{ duration: 4, repeat: Infinity }}
-                    className="absolute inset-0 w-64 h-64 bg-brand-primary/5 rounded-full blur-2xl"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="relative group">
-                      <div className="absolute -inset-4 bg-brand-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <Database size={64} className="text-brand-primary glow-primary relative z-10" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating Data Nodes - Fixed Positioning to prevent overlapping */}
-              <motion.div 
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-4 -right-12 bg-brand-surface/90 backdrop-blur-xl border border-white/10 p-6 rounded-sm shadow-2xl cyber-border z-20 min-w-[160px]"
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-2 h-2 bg-brand-primary rounded-full animate-ping" />
-                  <span className="hud-label">NETWORK LOAD</span>
-                </div>
-                <div className="text-3xl font-mono text-white tracking-tighter">0.042%</div>
-                <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                  <motion.div 
-                    animate={{ width: ['40%', '45%', '42%'] }}
-                    className="h-full bg-brand-primary" 
-                  />
-                </div>
-              </motion.div>
-              
-              <motion.div 
-                animate={{ y: [0, 10, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute -bottom-4 -left-12 bg-brand-surface/90 backdrop-blur-xl border border-white/10 p-6 rounded-sm shadow-2xl cyber-border z-20 min-w-[160px]"
-              >
-                <span className="hud-label block mb-2">BLOCK HEIGHT</span>
-                <div className="text-3xl font-mono text-brand-accent tracking-tighter">#8,492,102</div>
-                <div className="mt-2 flex gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className={`h-1 flex-1 rounded-full ${i < 4 ? 'bg-brand-accent' : 'bg-white/10'}`} />
-                  ))}
-                </div>
-              </motion.div>
-            </div>
+            <UrbanDigitalTwin />
           </motion.div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
   );
 };
 

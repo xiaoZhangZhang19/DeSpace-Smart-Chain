@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DeSpace Smart Chain</title>
     <script>
-      // Early workaround for TronLink extension proxy error
+      // Early workaround for TronLink extension proxy error in sandboxed environments
       (function() {
+        // 1. Try to pre-define the property to avoid proxy 'set' traps if possible
         try {
           var _tp = window.tronlinkParams || {};
           Object.defineProperty(window, 'tronlinkParams', {
@@ -15,7 +16,23 @@
             configurable: true,
             enumerable: true
           });
-        } catch (e) {}
+        } catch (e) {
+          // If defineProperty fails, we'll rely on the error listeners below
+        }
+
+        // 2. Intercept and silence the specific proxy error
+        var silenceError = function(e) {
+          var msg = (e && e.message) || (e && e.reason && e.reason.message) || "";
+          if (typeof msg === 'string' && msg.indexOf('tronlinkParams') !== -1) {
+            if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+            if (e.preventDefault) e.preventDefault();
+            return true;
+          }
+          return false;
+        };
+
+        window.addEventListener('error', silenceError, true);
+        window.addEventListener('unhandledrejection', silenceError, true);
       })();
     </script>
   </head>
