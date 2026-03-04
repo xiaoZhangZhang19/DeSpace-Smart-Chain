@@ -781,14 +781,14 @@ export default function ContractIDE() {
                 <><Play size={12} /> 编译合约</>
               )}
             </motion.button>
-            {/* BaaS 部署 */}
+            {/* 区块链浏览器 */}
             <a
-              href="http://121.196.226.157:5000/#/login"
+              href="http://8.137.93.11:5100/#/home"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono border border-brand-accent/30 rounded-sm text-brand-accent hover:bg-brand-accent/10 transition-all"
             >
-              <ExternalLink size={11} /> 前往 BaaS 部署
+              <ExternalLink size={11} /> 前往区块链浏览器
             </a>
           </div>
         </div>
