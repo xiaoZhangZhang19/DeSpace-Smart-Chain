@@ -291,16 +291,15 @@ const FeatureCard = ({ icon: Icon, title, description, delay }: any) => (
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
     transition={{ duration: 0.6, delay }}
-    className="glass-card p-8 hover:border-brand-primary/30 transition-all group cyber-border"
+    className="relative group"
   >
-    <div className="w-14 h-14 rounded-sm bg-brand-primary/5 border border-brand-primary/20 flex items-center justify-center mb-6 group-hover:bg-brand-primary/10 transition-colors glow-primary">
-      <Icon className="text-brand-primary w-7 h-7" />
-    </div>
-    <h3 className="text-xl font-black mb-4 tracking-tight">{title}</h3>
-    <p className="text-slate-400 leading-relaxed text-sm font-light">{description}</p>
-    <div className="mt-6 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-      <span className="hud-label text-brand-primary">ANALYZE DATA</span>
-      <ArrowRight size={12} className="text-brand-primary" />
+    <div className="absolute -inset-0.5 bg-brand-primary rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500" />
+    <div className="relative glass-card p-8 transition-all cyber-border">
+      <div className="w-14 h-14 rounded-sm bg-brand-primary/5 border border-brand-primary/20 flex items-center justify-center mb-6 group-hover:bg-brand-primary/10 transition-colors glow-primary">
+        <Icon className="text-brand-primary w-7 h-7" />
+      </div>
+      <h3 className="text-xl font-black mb-4 tracking-tight">{title}</h3>
+      <p className="text-slate-400 leading-relaxed text-sm font-light">{description}</p>
     </div>
   </motion.div>
 );
@@ -400,30 +399,32 @@ const DeveloperTools = () => {
           className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
         >
           {tools.map((tool, i) => (
-            <motion.div
-              key={i}
-              variants={item}
-              whileHover={{ y: -10, scale: 1.02 }}
-              onClick={() => {
-                if (tool.route) navigate(tool.route);
-                else if (tool.url) window.open(tool.url, '_blank');
-              }}
-              className={`glass-card p-8 border-white/5 hover:border-brand-primary/40 transition-all group relative overflow-hidden cyber-border ${tool.route || tool.url ? 'cursor-pointer' : ''}`}
-            >
-              <div className="absolute top-0 right-0 p-4">
-                <span className="text-[8px] font-mono text-slate-600 border border-white/5 px-2 py-0.5 rounded-sm">{tool.tag}</span>
-              </div>
-              <div className="w-14 h-14 rounded-sm bg-brand-primary/5 border border-brand-primary/20 flex items-center justify-center mb-8 group-hover:glow-primary transition-all">
-                <tool.icon className="text-brand-primary w-7 h-7" />
-              </div>
-              <h4 className="font-black text-lg mb-3 tracking-tight">{tool.title}</h4>
-              <p className="text-sm text-slate-500 leading-relaxed font-light group-hover:text-slate-300 transition-colors">{tool.desc}</p>
-              
-              <div className="mt-8 pt-6 border-t border-white/5 flex justify-between items-center">
-                <span className="hud-label text-[8px]">ACCESS MODULE</span>
-                <ChevronRight size={14} className="text-brand-primary opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
-              </div>
-            </motion.div>
+            <div key={i} className="relative group">
+              <div className="absolute -inset-0.5 bg-brand-primary rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500" />
+              <motion.div
+                variants={item}
+                whileHover={{ y: -10, scale: 1.02 }}
+                onClick={() => {
+                  if (tool.route) navigate(tool.route);
+                  else if (tool.url) window.open(tool.url, '_blank');
+                }}
+                className={`relative glass-card p-8 border-white/5 hover:border-brand-primary/40 transition-all overflow-hidden cyber-border h-full ${tool.route || tool.url ? 'cursor-pointer' : ''}`}
+              >
+                <div className="absolute top-0 right-0 p-4">
+                  <span className="text-[8px] font-mono text-slate-600 border border-white/5 px-2 py-0.5 rounded-sm">{tool.tag}</span>
+                </div>
+                <div className="w-14 h-14 rounded-sm bg-brand-primary/5 border border-brand-primary/20 flex items-center justify-center mb-8 group-hover:glow-primary transition-all">
+                  <tool.icon className="text-brand-primary w-7 h-7" />
+                </div>
+                <h4 className="font-black text-lg mb-3 tracking-tight">{tool.title}</h4>
+                <p className="text-sm text-slate-500 leading-relaxed font-light group-hover:text-slate-300 transition-colors">{tool.desc}</p>
+
+                <div className="mt-8 pt-6 border-t border-white/5 flex justify-between items-center">
+                  <span className="hud-label text-[8px]">ACCESS MODULE</span>
+                  <ChevronRight size={14} className="text-brand-primary opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+                </div>
+              </motion.div>
+            </div>
           ))}
         </motion.div>
       </div>
@@ -556,32 +557,34 @@ const TechnicalAdvantages = () => {
 
           <div className="lg:w-3/5 space-y-8">
             {advantages.map((adv, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="glass-card p-10 flex flex-col md:flex-row gap-10 items-start md:items-center hover:bg-white/[0.04] transition-all border-l-2 border-l-transparent hover:border-l-brand-primary group cyber-border"
-              >
-                <div className="w-20 h-20 shrink-0 rounded-sm bg-brand-secondary border border-white/10 flex items-center justify-center shadow-2xl group-hover:glow-primary transition-all">
-                  <adv.icon className="text-brand-primary w-10 h-10" />
-                </div>
-                <div className="flex-grow">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex flex-col">
-                      <span className="hud-label text-[8px] text-brand-primary mb-1">{adv.id}</span>
-                      <h3 className="text-2xl font-black tracking-tight">{adv.title}</h3>
-                    </div>
-                    <span className="text-[10px] font-mono bg-brand-primary/10 text-brand-primary px-3 py-1 rounded-sm uppercase tracking-widest border border-brand-primary/20">
-                      {adv.stats}
-                    </span>
+              <div key={i} className="relative group">
+                <div className="absolute -inset-0.5 bg-brand-primary rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500" />
+                <motion.div
+                  initial={{ opacity: 0, x: 30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: i * 0.1 }}
+                  className="relative glass-card p-10 flex flex-col md:flex-row gap-10 items-start md:items-center hover:bg-white/[0.04] transition-all border-l-2 border-l-transparent hover:border-l-brand-primary cyber-border"
+                >
+                  <div className="w-20 h-20 shrink-0 rounded-sm bg-brand-secondary border border-white/10 flex items-center justify-center shadow-2xl group-hover:glow-primary transition-all">
+                    <adv.icon className="text-brand-primary w-10 h-10" />
                   </div>
-                  <p className="text-slate-400 leading-relaxed font-light">
-                    {adv.desc}
-                  </p>
-                </div>
-              </motion.div>
+                  <div className="flex-grow">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex flex-col">
+                        <span className="hud-label text-[8px] text-brand-primary mb-1">{adv.id}</span>
+                        <h3 className="text-2xl font-black tracking-tight">{adv.title}</h3>
+                      </div>
+                      <span className="text-[10px] font-mono bg-brand-primary/10 text-brand-primary px-3 py-1 rounded-sm uppercase tracking-widest border border-brand-primary/20">
+                        {adv.stats}
+                      </span>
+                    </div>
+                    <p className="text-slate-400 leading-relaxed font-light">
+                      {adv.desc}
+                    </p>
+                  </div>
+                </motion.div>
+              </div>
             ))}
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16">
