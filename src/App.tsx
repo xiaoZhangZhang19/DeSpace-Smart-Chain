@@ -475,20 +475,23 @@ const CodePreview = () => {
               </div>
               <pre className="text-slate-300 leading-relaxed">
                 <code className="block">
-                  <span className="text-pink-500">import</span> {'{ DSC }'} <span className="text-pink-500">from</span> <span className="text-cyan-400">'@dsc/sdk'</span>;<br /><br />
-                  <span className="text-slate-500">// 1. 初始化国密账户</span><br />
-                  <span className="text-pink-500">const</span> account = DSC.Account.create();<br /><br />
-                  <span className="text-slate-500">// 2. 部署存证合约</span><br />
-                  <span className="text-pink-500">const</span> contract = <span className="text-pink-500">await</span> DSC.Contract.deploy(<span className="text-cyan-400">'Evidence'</span>);<br /><br />
-                  <span className="text-slate-500">// 3. 提交存证数据</span><br />
-                  <span className="text-pink-500">await</span> contract.call(<span className="text-cyan-400">'submit'</span>, {'{'} <br />
-                  &nbsp;&nbsp;dataHash: <span className="text-cyan-400">'0x8f2a...e91c'</span>, <br />
-                  &nbsp;&nbsp;category: <span className="text-cyan-400">'finance'</span> <br />
-                  {'}'});
+                  <span className="text-pink-500">import</span> {'{ BcosSDK }'} <span className="text-pink-500">from</span> <span className="text-cyan-400">'@fisco-bcos/web3sdk'</span>;<br />
+                  <span className="text-pink-500">import</span> {'{ Evidence }'} <span className="text-pink-500">from</span> <span className="text-cyan-400">'./contracts/Evidence'</span>;<br /><br />
+                  <span className="text-slate-500">// 1. 初始化 SDK & 获取国密客户端</span><br />
+                  <span className="text-pink-500">const</span> sdk = <span className="text-pink-500">await</span> BcosSDK.build(<span className="text-cyan-400">'./config.toml'</span>);<br />
+                  <span className="text-pink-500">const</span> client = sdk.getClient(<span className="text-yellow-400">1</span>);<br /><br />
+                  <span className="text-slate-500">// 2. 获取国密密钥对</span><br />
+                  <span className="text-pink-500">const</span> keyPair = client.getCryptoSuite().getCryptoKeyPair();<br /><br />
+                  <span className="text-slate-500">// 3. 部署存证合约</span><br />
+                  <span className="text-pink-500">const</span> evidence = <span className="text-pink-500">await</span> Evidence.deploy(client, keyPair);<br /><br />
+                  <span className="text-slate-500">// 4. 提交存证哈希上链</span><br />
+                  <span className="text-pink-500">const</span> receipt = <span className="text-pink-500">await</span> evidence.newEvidence(<br />
+                  &nbsp;&nbsp;<span className="text-cyan-400">'0x8f2a3b...e91c'</span>, &nbsp;<span className="text-cyan-400">'finance'</span><br />
+                  );
                 </code>
               </pre>
               <div className="mt-6 pt-4 border-t border-white/5 flex justify-between items-center opacity-50">
-                <span className="text-[10px] text-slate-500">Lines: 12</span>
+                <span className="text-[10px] text-slate-500">Lines: 15</span>
                 <span className="text-[10px] text-slate-500">UTF-8</span>
               </div>
             </div>
