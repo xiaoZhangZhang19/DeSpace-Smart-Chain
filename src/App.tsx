@@ -680,18 +680,18 @@ const Solutions = () => {
             }
           ].map((solution, i) => (
             <motion.div key={i} variants={item} className="relative group">
-              <div className={`absolute -inset-0.5 bg-brand-${solution.color === 'brand-primary' ? 'primary' : 'accent'} rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500`}></div>
+              <div className={`absolute -inset-0.5 ${solution.color === 'brand-primary' ? 'bg-brand-primary' : 'bg-brand-accent'} rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500`}></div>
               <div className="relative glass-card p-10 h-full cyber-border flex flex-col">
                 <div className="flex items-center gap-4 mb-8">
-                  <div className={`w-12 h-12 rounded-sm bg-${solution.color}/10 flex items-center justify-center border border-${solution.color}/20`}>
-                    <solution.icon className={`text-${solution.color}`} size={24} />
+                  <div className={`w-12 h-12 rounded-sm flex items-center justify-center border ${solution.color === 'brand-primary' ? 'bg-brand-primary/10 border-brand-primary/20' : 'bg-brand-accent/10 border-brand-accent/20'}`}>
+                    <solution.icon className={solution.color === 'brand-primary' ? 'text-brand-primary' : 'text-brand-accent'} size={24} />
                   </div>
                   <h3 className="text-2xl font-black tracking-tight">{solution.title}</h3>
                 </div>
                 <ul className="space-y-6 flex-grow">
                   {solution.items.map((item, j) => (
                     <li key={j} className="flex items-start gap-4 group/item">
-                      <div className={`w-1.5 h-1.5 rounded-full bg-${solution.color} mt-2 shrink-0 animate-pulse`} />
+                      <div className={`w-1.5 h-1.5 rounded-full ${solution.color === 'brand-primary' ? 'bg-brand-primary' : 'bg-brand-accent'} mt-2 shrink-0 animate-pulse`} />
                       <span className="text-sm text-slate-400 leading-relaxed font-light group-hover/item:text-slate-200 transition-colors">{item}</span>
                     </li>
                   ))}
