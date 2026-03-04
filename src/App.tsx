@@ -696,9 +696,6 @@ const Solutions = () => {
                     </li>
                   ))}
                 </ul>
-                <div className="mt-10 pt-6 border-t border-white/5">
-                  <span className="hud-label text-[8px]">PROTOCOL: DSC-CORE-v2</span>
-                </div>
               </div>
             </motion.div>
           ))}
