@@ -680,7 +680,7 @@ const Solutions = () => {
             }
           ].map((solution, i) => (
             <motion.div key={i} variants={item} className="relative group">
-              <div className={`absolute -inset-0.5 ${solution.color === 'brand-primary' ? 'bg-brand-primary' : 'bg-brand-accent'} rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500`}></div>
+              <div className="absolute -inset-0.5 bg-brand-primary rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
               <div className="relative glass-card p-10 h-full cyber-border flex flex-col">
                 <div className="flex items-center gap-4 mb-8">
                   <div className={`w-12 h-12 rounded-sm flex items-center justify-center border ${solution.color === 'brand-primary' ? 'bg-brand-primary/10 border-brand-primary/20' : 'bg-brand-accent/10 border-brand-accent/20'}`}>
