@@ -592,7 +592,7 @@ export default function Documentation() {
 
           <Note type="tip">相关软件和环境版本说明！请查看兼容性文档。</Note>
 
-          <P>本章将会介绍一个基于FISCO BCOS区块链的业务应用场景开发全过程，从业务场景分析，到合约的设计实现，然后介绍合约编译以及如何部署到区块链，最后介绍一个应用模块的实现，通过提供的Java SDK实现对区块链上合约的调用访问。</P>
+          <P>本章将会介绍一个基于DeSpace区块链的业务应用场景开发全过程，从业务场景分析，到合约的设计实现，然后介绍合约编译以及如何部署到区块链，最后介绍一个应用模块的实现，通过提供的Java SDK实现对区块链上合约的调用访问。</P>
           <P>本教程要求用户熟悉Linux操作环境，具备Java开发的基本技能，能够使用Gradle工具，熟悉Solidity语法。</P>
           <P>如果您还未搭建区块链网络，或未下载控制台，请先走完教程搭建第一个区块链网络，再回到本教程。</P>
 
@@ -609,7 +609,7 @@ export default function Documentation() {
 
           <H3 id="s2-step1">第一步. 设计智能合约</H3>
           <H4>存储设计</H4>
-          <P>FISCO BCOS提供合约CRUD接口开发模式，可以通过合约创建表，并对创建的表进行增删改查操作。针对本应用需要设计一个存储资产管理的表<IC>t_asset</IC>，该表字段如下：</P>
+          <P>DeSpace提供合约CRUD接口开发模式，可以通过合约创建表，并对创建的表进行增删改查操作。针对本应用需要设计一个存储资产管理的表<IC>t_asset</IC>，该表字段如下：</P>
           <UL>
             <LI><IC>account</IC>: 主键，资产账户(string类型)</LI>
             <LI><IC>asset_value</IC>: 资产金额(uint256类型)</LI>
@@ -639,6 +639,8 @@ function register(string account, uint256 amount) public returns(int256)
 // 资产转移
 function transfer(string from_asset_account, string to_asset_account, uint256 amount) public returns(int256)`} />
 
+
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/asset_contract.png" alt="资产合约接口设计" className="my-4 rounded-sm border border-white/10 max-w-full" />
           <H3 id="s2-step2">第二步. 开发源码</H3>
           <P>根据第一步的存储和接口设计，创建一个Asset的智能合约，实现注册、转账、查询功能，并引入一个叫Table的系统合约，这个合约提供了CRUD接口。</P>
           <CodeBlock language="bash" code={`# 进入console/contracts目录
@@ -650,7 +652,7 @@ vi Asset.sol
 # 并键入wq保存退出。`} />
           <P><IC>Asset.sol</IC>的内容如下：</P>
           <CodeBlock language="solidity" code={assetSol} />
-          <P><IC>Asset.sol</IC>所引用的<IC>Table.sol</IC>已在<IC>~/fisco/console/contracts/solidity</IC>目录下。该系统合约文件中的接口由FISCO BCOS底层实现。当业务合约需要操作CRUD接口时，均需要引入该接口合约文件。Table.sol 合约详细接口参考相关文档。</P>
+          <P><IC>Asset.sol</IC>所引用的<IC>Table.sol</IC>已在<IC>~/fisco/console/contracts/solidity</IC>目录下。该系统合约文件中的接口由DeSpace底层实现。当业务合约需要操作CRUD接口时，均需要引入该接口合约文件。Table.sol 合约详细接口参考相关文档。</P>
           <P>运行<IC>ls</IC>命令，确保<IC>Asset.sol</IC>和<IC>Table.sol</IC>在目录<IC>~/fisco/console/contracts/solidity</IC>下。</P>
 
           <H2 id="s3">3. 编译智能合约</H2>
@@ -728,19 +730,25 @@ $ java -version
           <H4>IDE：IntelliJ IDE</H4>
           <P>进入IntelliJ IDE官网，下载并安装社区版IntelliJ IDE</P>
 
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/install_java_intellij.gif" alt="安装IntelliJ IDE" className="my-4 rounded-sm border border-white/10 max-w-full" />
+
           <H3 id="s4-step2">第二步. 创建一个Java工程</H3>
           <P>在IntelliJ IDE中创建一个gradle项目，勾选Gradle和Java，并输入工程名<IC>asset-app</IC>。</P>
+
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/create_app_mid.gif" alt="创建Java工程" className="my-4 rounded-sm border border-white/10 max-w-full" />
           <Note type="warning">该项目的源码可以用以下方法获得并参考。（此步骤为非必须步骤）</Note>
           <CodeBlock language="bash" code={`$ cd ~/fisco
 $ curl -#LO https://github.com/FISCO-BCOS/LargeFiles/raw/master/tools/asset-app.tar.gz
 # 解压得到Java工程项目asset-app
 $ tar -zxf asset-app.tar.gz`} />
+
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/download_asset.png" alt="下载asset-app" className="my-4 rounded-sm border border-white/10 max-w-full" />
           <Note type="note">如果因为网络问题导致长时间无法下载，请尝试将<IC>199.232.28.133 raw.githubusercontent.com</IC>追加到<IC>/etc/hosts</IC>中，或者请尝试：
             <CodeBlock language="bash" code="curl -#LO https://gitee.com/FISCO-BCOS/asset-app-demo/releases/download/v0.0.1/asset-app.tar.gz" />
           </Note>
 
-          <H3 id="s4-step3">第三步. 引入FISCO BCOS Java SDK</H3>
-          <P>在build.gradle文件中的<IC>dependencies</IC>下加入对FISCO BCOS Java SDK的引用。</P>
+          <H3 id="s4-step3">第三步. 引入DeSpace Java SDK</H3>
+          <P>在build.gradle文件中的<IC>dependencies</IC>下加入对DeSpace Java SDK的引用。</P>
           <CodeBlock language="gradle" code={`repositories {
     mavenCentral()
     maven {
@@ -755,6 +763,8 @@ $ tar -zxf asset-app.tar.gz`} />
           <P>引入Java SDK jar包</P>
           <CodeBlock language="gradle" code={`testImplementation group: 'junit', name: 'junit', version: '4.12'
 implementation ('org.fisco-bcos.java-sdk:fisco-bcos-java-sdk:2.9.1')`} />
+
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/import_sdk.png" alt="引入Java SDK" className="my-4 rounded-sm border border-white/10 max-w-full" />
 
           <H3 id="s4-step4">第四步. 配置SDK证书</H3>
           <P>修改<IC>build.gradle</IC>文件，引入Spring框架。</P>
@@ -771,9 +781,13 @@ dependencies {
     implementation ("org.fisco-bcos.java-sdk:fisco-bcos-java-sdk:2.9.1")
     implementation spring
 }`} />
+
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/import_spring.png" alt="引入Spring框架" className="my-4 rounded-sm border border-white/10 max-w-full" />
           <P>在<IC>asset-app/test/resources</IC>目录下创建配置文件<IC>applicationContext.xml</IC>，写入配置内容。各配置项的内容可参考Java SDK 配置说明，该配置说明以toml配置文件为例，本例中的配置项与该配置项相对应。</P>
           <P><IC>applicationContext.xml</IC>的内容如下：</P>
           <CodeBlock language="xml" code={appXml} />
+
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/config.png" alt="applicationContext.xml配置" className="my-4 rounded-sm border border-white/10 max-w-full" />
           <Note type="warning">如果搭链时设置的jsonrpc_listen_ip为127.0.0.1或者0.0.0.0，channel_port为20200，则<IC>applicationContext.xml</IC>配置不用修改。若区块链节点配置有改动，需要同样修改配置<IC>applicationContext.xml</IC>的<IC>network</IC>属性下的<IC>peers</IC>配置选项，配置所连接节点的<IC>IP:channel_listen_port</IC>。</Note>
           <P>在以上配置文件中，我们指定了证书存放的位<IC>certPath</IC>的值为<IC>conf</IC>。接下来我们需要把SDK用于连接节点的证书放到指定的<IC>conf</IC>目录下。</P>
           <CodeBlock language="bash" code={`# 假设我们将asset-app放在~/fisco目录下 进入~/fisco目录
@@ -786,6 +800,8 @@ $ cp -r nodes/127.0.0.1/sdk/* asset-app/src/test/resources/conf
 $ mkdir -p asset-app/src/main/resources/conf
 $ cp -r nodes/127.0.0.1/sdk/* asset-app/src/main/resources/conf`} />
 
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/copy_cert.png" alt="拷贝节点证书" className="my-4 rounded-sm border border-white/10 max-w-full" />
+
           <H2 id="s5">5. 业务逻辑开发</H2>
           <P>我们已经介绍了如何在自己的项目中引入以及配置Java SDK，本节介绍如何通过Java程序调用合约，同样以示例的资产管理说明。</P>
 
@@ -794,11 +810,15 @@ $ cp -r nodes/127.0.0.1/sdk/* asset-app/src/main/resources/conf`} />
 # 将编译好的合约Java类引入项目中。
 cp console/contracts/sdk/java/org/fisco/bcos/asset/contract/Asset.java asset-app/src/main/java/org/fisco/bcos/asset/contract/Asset.java`} />
 
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/copy_contract.png" alt="引入合约Java类" className="my-4 rounded-sm border border-white/10 max-w-full" />
+
           <H3 id="s5-step2">第二步. 开发业务逻辑</H3>
           <P>在路径<IC>/src/main/java/org/fisco/bcos/asset/client</IC>目录下，创建<IC>AssetClient.java</IC>类，通过调用<IC>Asset.java</IC>实现对合约的部署与调用</P>
           <P><IC>AssetClient.java</IC> 代码如下：</P>
           <CodeBlock language="java" code={assetClientJava} />
-          <P>让我们通过AssetClient这个例子，来了解FISCO BCOS Java SDK的调用：</P>
+
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/asset_client.png" alt="AssetClient代码" className="my-4 rounded-sm border border-white/10 max-w-full" />
+          <P>让我们通过AssetClient这个例子，来了解DeSpace Java SDK的调用：</P>
           <H4>初始化</H4>
           <P>初始化代码的主要功能为构造Client与CryptoKeyPair对象，这两个对象在创建对应的合约类对象(调用合约类的deploy或者load函数)时需要使用。</P>
           <CodeBlock language="java" code={`// 函数initialize中进行初始化 
@@ -868,6 +888,8 @@ function usage()
     esac
 
     java -Djdk.tls.namedGroups="secp256k1" -cp 'apps/*:conf/:lib/*' org.fisco.bcos.asset.client.AssetClient $@`} />
+
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/make_sh.png" alt="创建运行脚本" className="my-4 rounded-sm border border-white/10 max-w-full" />
           <P>接着，配置好log。在<IC>asset-app/src/test/resources</IC>目录下创建<IC>log4j.properties</IC></P>
           <CodeBlock language="properties" code={`### set log levels ###
 log4j.rootLogger=DEBUG, file
@@ -886,6 +908,8 @@ log4j.appender.stdout=org.apache.log4j.ConsoleAppender
 log4j.appender.stdout.Target=System.out
 log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
 log4j.appender.stdout.layout.ConversionPattern=[%p] [%-d{yyyy-MM-dd HH:mm:ss}] %C{1}.%M(%L) | %m%n`} />
+
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/config_log.png" alt="配置log4j" className="my-4 rounded-sm border border-white/10 max-w-full" />
           <P>接着，通过配置gradle中的Jar命令，指定复制和编译任务。并引入日志库，在<IC>asset-app/src/test/resources</IC>目录下，创建一个空的<IC>contract.properties</IC>文件，用于应用在运行时存放合约地址。</P>
           <CodeBlock language="gradle" code={`dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
@@ -921,6 +945,8 @@ jar {
         }
     }
 }`} />
+
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/conf_jar_log.png" alt="配置Jar与日志" className="my-4 rounded-sm border border-white/10 max-w-full" />
           <P>至此，我们已经完成了这个应用的开发。最后，我们得到的assert-app的目录结构如下：</P>
           <CodeBlock language="bash" code={`|-- build.gradle // gradle配置文件
 |-- gradle
@@ -1003,10 +1029,12 @@ $ bash asset_run.sh query Alice
 account Alice, value 50000
 $ bash asset_run.sh query Bob
 account Bob, value 150000`} />
-          <Note type="tip">至此，我们通过合约开发，合约编译，SDK配置与业务开发构建了一个基于FISCO BCOS联盟区块链的应用。</Note>
+
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/test.png" alt="运行测试结果" className="my-4 rounded-sm border border-white/10 max-w-full" />
+          <Note type="tip">至此，我们通过合约开发，合约编译，SDK配置与业务开发构建了一个基于DeSpace联盟区块链的应用。</Note>
 
           <div className="mt-16 pt-8 border-t border-white/5 text-slate-600 text-xs space-y-2">
-            <p>© Copyright FISCO BCOS 2019. 本技术文档适用于FISCO BCOS 2.x版本，FISCO BCOS 3.x版本技术文档请查看这里，FISCO BCOS 1.3版本技术文档请查看这里。</p>
+            <p>© Copyright DeSpace 2019. 本技术文档适用于DeSpace 2.x版本，DeSpace 3.x版本技术文档请查看这里，DeSpace 1.3版本技术文档请查看这里。</p>
             <p>Built with Sphinx using a theme provided by Read the Docs.</p>
             <button onClick={() => navigate('/')} className="flex items-center gap-1.5 hover:text-brand-primary transition-colors mt-4">
               <ArrowLeft size={12} /> 返回官网
