@@ -640,7 +640,7 @@ function register(string account, uint256 amount) public returns(int256)
 function transfer(string from_asset_account, string to_asset_account, uint256 amount) public returns(int256)`} />
 
 
-          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/asset_contract.png" alt="资产合约接口设计" className="my-4 rounded-sm border border-white/10 max-w-full" />
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/asset_contract.png" alt="资产合约接口设计" className="my-4 rounded-sm border border-white/10 w-full object-contain bg-white/5" />
           <H3 id="s2-step2">第二步. 开发源码</H3>
           <P>根据第一步的存储和接口设计，创建一个Asset的智能合约，实现注册、转账、查询功能，并引入一个叫Table的系统合约，这个合约提供了CRUD接口。</P>
           <CodeBlock language="bash" code={`# 进入console/contracts目录
@@ -730,19 +730,19 @@ $ java -version
           <H4>IDE：IntelliJ IDE</H4>
           <P>进入IntelliJ IDE官网，下载并安装社区版IntelliJ IDE</P>
 
-          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/install_java_intellij.gif" alt="安装IntelliJ IDE" className="my-4 rounded-sm border border-white/10 max-w-full" />
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/install_java_intellij.gif" alt="安装IntelliJ IDE" className="my-4 rounded-sm border border-white/10 w-full object-contain bg-white/5" />
 
           <H3 id="s4-step2">第二步. 创建一个Java工程</H3>
           <P>在IntelliJ IDE中创建一个gradle项目，勾选Gradle和Java，并输入工程名<IC>asset-app</IC>。</P>
 
-          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/create_app_mid.gif" alt="创建Java工程" className="my-4 rounded-sm border border-white/10 max-w-full" />
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/create_app_mid.gif" alt="创建Java工程" className="my-4 rounded-sm border border-white/10 w-full object-contain bg-white/5" />
           <Note type="warning">该项目的源码可以用以下方法获得并参考。（此步骤为非必须步骤）</Note>
           <CodeBlock language="bash" code={`$ cd ~/fisco
 $ curl -#LO https://github.com/FISCO-BCOS/LargeFiles/raw/master/tools/asset-app.tar.gz
 # 解压得到Java工程项目asset-app
 $ tar -zxf asset-app.tar.gz`} />
 
-          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/download_asset.png" alt="下载asset-app" className="my-4 rounded-sm border border-white/10 max-w-full" />
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/download_asset.png" alt="下载asset-app" className="my-4 rounded-sm border border-white/10 w-full object-contain bg-white/5" />
           <Note type="note">如果因为网络问题导致长时间无法下载，请尝试将<IC>199.232.28.133 raw.githubusercontent.com</IC>追加到<IC>/etc/hosts</IC>中，或者请尝试：
             <CodeBlock language="bash" code="curl -#LO https://gitee.com/FISCO-BCOS/asset-app-demo/releases/download/v0.0.1/asset-app.tar.gz" />
           </Note>
@@ -764,7 +764,7 @@ $ tar -zxf asset-app.tar.gz`} />
           <CodeBlock language="gradle" code={`testImplementation group: 'junit', name: 'junit', version: '4.12'
 implementation ('org.fisco-bcos.java-sdk:fisco-bcos-java-sdk:2.9.1')`} />
 
-          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/import_sdk.png" alt="引入Java SDK" className="my-4 rounded-sm border border-white/10 max-w-full" />
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/import_sdk.png" alt="引入Java SDK" className="my-4 rounded-sm border border-white/10 w-full object-contain bg-white/5" />
 
           <H3 id="s4-step4">第四步. 配置SDK证书</H3>
           <P>修改<IC>build.gradle</IC>文件，引入Spring框架。</P>
@@ -782,12 +782,12 @@ dependencies {
     implementation spring
 }`} />
 
-          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/import_spring.png" alt="引入Spring框架" className="my-4 rounded-sm border border-white/10 max-w-full" />
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/import_spring.png" alt="引入Spring框架" className="my-4 rounded-sm border border-white/10 w-full object-contain bg-white/5" />
           <P>在<IC>asset-app/test/resources</IC>目录下创建配置文件<IC>applicationContext.xml</IC>，写入配置内容。各配置项的内容可参考Java SDK 配置说明，该配置说明以toml配置文件为例，本例中的配置项与该配置项相对应。</P>
           <P><IC>applicationContext.xml</IC>的内容如下：</P>
           <CodeBlock language="xml" code={appXml} />
 
-          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/config.png" alt="applicationContext.xml配置" className="my-4 rounded-sm border border-white/10 max-w-full" />
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/config.png" alt="applicationContext.xml配置" className="my-4 rounded-sm border border-white/10 w-full object-contain bg-white/5" />
           <Note type="warning">如果搭链时设置的jsonrpc_listen_ip为127.0.0.1或者0.0.0.0，channel_port为20200，则<IC>applicationContext.xml</IC>配置不用修改。若区块链节点配置有改动，需要同样修改配置<IC>applicationContext.xml</IC>的<IC>network</IC>属性下的<IC>peers</IC>配置选项，配置所连接节点的<IC>IP:channel_listen_port</IC>。</Note>
           <P>在以上配置文件中，我们指定了证书存放的位<IC>certPath</IC>的值为<IC>conf</IC>。接下来我们需要把SDK用于连接节点的证书放到指定的<IC>conf</IC>目录下。</P>
           <CodeBlock language="bash" code={`# 假设我们将asset-app放在~/fisco目录下 进入~/fisco目录
@@ -800,7 +800,7 @@ $ cp -r nodes/127.0.0.1/sdk/* asset-app/src/test/resources/conf
 $ mkdir -p asset-app/src/main/resources/conf
 $ cp -r nodes/127.0.0.1/sdk/* asset-app/src/main/resources/conf`} />
 
-          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/copy_cert.png" alt="拷贝节点证书" className="my-4 rounded-sm border border-white/10 max-w-full" />
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/copy_cert.png" alt="拷贝节点证书" className="my-4 rounded-sm border border-white/10 w-full object-contain bg-white/5" />
 
           <H2 id="s5">5. 业务逻辑开发</H2>
           <P>我们已经介绍了如何在自己的项目中引入以及配置Java SDK，本节介绍如何通过Java程序调用合约，同样以示例的资产管理说明。</P>
@@ -810,14 +810,14 @@ $ cp -r nodes/127.0.0.1/sdk/* asset-app/src/main/resources/conf`} />
 # 将编译好的合约Java类引入项目中。
 cp console/contracts/sdk/java/org/fisco/bcos/asset/contract/Asset.java asset-app/src/main/java/org/fisco/bcos/asset/contract/Asset.java`} />
 
-          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/copy_contract.png" alt="引入合约Java类" className="my-4 rounded-sm border border-white/10 max-w-full" />
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/copy_contract.png" alt="引入合约Java类" className="my-4 rounded-sm border border-white/10 w-full object-contain bg-white/5" />
 
           <H3 id="s5-step2">第二步. 开发业务逻辑</H3>
           <P>在路径<IC>/src/main/java/org/fisco/bcos/asset/client</IC>目录下，创建<IC>AssetClient.java</IC>类，通过调用<IC>Asset.java</IC>实现对合约的部署与调用</P>
           <P><IC>AssetClient.java</IC> 代码如下：</P>
           <CodeBlock language="java" code={assetClientJava} />
 
-          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/asset_client.png" alt="AssetClient代码" className="my-4 rounded-sm border border-white/10 max-w-full" />
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/asset_client.png" alt="AssetClient代码" className="my-4 rounded-sm border border-white/10 w-full object-contain bg-white/5" />
           <P>让我们通过AssetClient这个例子，来了解DeSpace Java SDK的调用：</P>
           <H4>初始化</H4>
           <P>初始化代码的主要功能为构造Client与CryptoKeyPair对象，这两个对象在创建对应的合约类对象(调用合约类的deploy或者load函数)时需要使用。</P>
@@ -889,7 +889,7 @@ function usage()
 
     java -Djdk.tls.namedGroups="secp256k1" -cp 'apps/*:conf/:lib/*' org.fisco.bcos.asset.client.AssetClient $@`} />
 
-          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/make_sh.png" alt="创建运行脚本" className="my-4 rounded-sm border border-white/10 max-w-full" />
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/make_sh.png" alt="创建运行脚本" className="my-4 rounded-sm border border-white/10 w-full object-contain bg-white/5" />
           <P>接着，配置好log。在<IC>asset-app/src/test/resources</IC>目录下创建<IC>log4j.properties</IC></P>
           <CodeBlock language="properties" code={`### set log levels ###
 log4j.rootLogger=DEBUG, file
@@ -909,7 +909,7 @@ log4j.appender.stdout.Target=System.out
 log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
 log4j.appender.stdout.layout.ConversionPattern=[%p] [%-d{yyyy-MM-dd HH:mm:ss}] %C{1}.%M(%L) | %m%n`} />
 
-          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/config_log.png" alt="配置log4j" className="my-4 rounded-sm border border-white/10 max-w-full" />
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/config_log.png" alt="配置log4j" className="my-4 rounded-sm border border-white/10 w-full object-contain bg-white/5" />
           <P>接着，通过配置gradle中的Jar命令，指定复制和编译任务。并引入日志库，在<IC>asset-app/src/test/resources</IC>目录下，创建一个空的<IC>contract.properties</IC>文件，用于应用在运行时存放合约地址。</P>
           <CodeBlock language="gradle" code={`dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
@@ -946,7 +946,7 @@ jar {
     }
 }`} />
 
-          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/conf_jar_log.png" alt="配置Jar与日志" className="my-4 rounded-sm border border-white/10 max-w-full" />
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/conf_jar_log.png" alt="配置Jar与日志" className="my-4 rounded-sm border border-white/10 w-full object-contain bg-white/5" />
           <P>至此，我们已经完成了这个应用的开发。最后，我们得到的assert-app的目录结构如下：</P>
           <CodeBlock language="bash" code={`|-- build.gradle // gradle配置文件
 |-- gradle
@@ -1030,7 +1030,7 @@ account Alice, value 50000
 $ bash asset_run.sh query Bob
 account Bob, value 150000`} />
 
-          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/test.png" alt="运行测试结果" className="my-4 rounded-sm border border-white/10 max-w-full" />
+          <img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/test.png" alt="运行测试结果" className="my-4 rounded-sm border border-white/10 w-full object-contain bg-white/5" />
           <Note type="tip">至此，我们通过合约开发，合约编译，SDK配置与业务开发构建了一个基于DeSpace联盟区块链的应用。</Note>
 
           <div className="mt-16 pt-8 border-t border-white/5 text-slate-600 text-xs space-y-2">
