@@ -28,6 +28,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import ContractTemplates from './pages/ContractTemplates';
 import ContractIDE from './pages/ContractIDE';
+import Documentation from './pages/Documentation';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -230,6 +231,7 @@ const UrbanDigitalTwin = () => {
 };
 
 const Hero = () => {
+  const navigate = useNavigate();
   return (
     <section id="vision" className="relative pb-20 overflow-hidden grid-background min-h-screen flex flex-col">
       {/* Background Elements */}
@@ -261,11 +263,8 @@ const Hero = () => {
               DeSpace Smart Chain (DSC) 是专注“城市空间”垂直场景的产业区块链基础设施，为 <span className="text-white font-mono font-bold">320B m²</span> 存量资产提供高频可信数据底座。
             </p>
             <div className="flex flex-wrap gap-6">
-              <button className="px-10 py-4 rounded-sm bg-brand-primary text-brand-secondary font-black text-xs uppercase tracking-widest flex items-center gap-3 hover:scale-105 transition-all glow-primary">
+              <button onClick={() => navigate('/docs')} className="px-10 py-4 rounded-sm bg-brand-primary text-brand-secondary font-black text-xs uppercase tracking-widest flex items-center gap-3 hover:scale-105 transition-all glow-primary">
                 START BUILDING <ArrowRight size={16} />
-              </button>
-              <button className="px-10 py-4 rounded-sm border border-white/10 hover:border-brand-primary/50 hover:bg-white/5 text-xs font-bold uppercase tracking-widest transition-all">
-                DOCUMENTATION
               </button>
             </div>
           </motion.div>
@@ -458,9 +457,6 @@ const CodePreview = () => {
                 </div>
               ))}
             </div>
-            <button className="flex items-center gap-2 text-brand-primary font-bold text-xs uppercase tracking-widest group">
-              VIEW FULL DOCUMENTATION <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
-            </button>
           </div>
 
           <div className="relative">
@@ -762,7 +758,6 @@ const Footer = () => {
           <div>
             <h4 className="hud-label text-white mb-8">DEVELOPERS</h4>
             <ul className="space-y-4 text-slate-500 text-[10px] font-light uppercase tracking-widest">
-              <li><a href="#" className="hover:text-brand-primary transition-colors">DOCUMENTATION</a></li>
               <li><a href="#" className="hover:text-brand-primary transition-colors">SMART CONTRACTS</a></li>
               <li><a href="#" className="hover:text-brand-primary transition-colors">NODE SETUP</a></li>
               <li><a href="#" className="hover:text-brand-primary transition-colors">API REFERENCE</a></li>
@@ -1018,6 +1013,7 @@ export default function App() {
       <Route path="/" element={<HomePage />} />
       <Route path="/contracts" element={<ContractTemplates />} />
       <Route path="/ide"       element={<ContractIDE />} />
+      <Route path="/docs"      element={<Documentation />} />
     </Routes>
   );
 }
