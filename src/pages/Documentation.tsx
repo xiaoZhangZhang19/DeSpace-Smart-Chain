@@ -1110,7 +1110,7 @@ $ source .zashrc`} />
           <Note type="note">若使用最新的控制台生成Java代码，请将Java SDK升级到2.8.0+版本。</Note>
 
           <H4>第三步. 配置SDK证书</H4>
-          <P>大部分场景仅需要配置certPath配置项，将节点证书从<IC>nodes/${'{'}ip{'}'}/sdk/</IC>目录拷贝到certPath指定路径：</P>
+          <P>大部分场景仅需要配置certPath配置项，将节点证书从<IC>nodes/$&#123;ip&#125;/sdk/</IC>目录拷贝到certPath指定路径：</P>
           <CodeBlock language="bash" code={`mkdir -p conf && cp -r ~/fisco/nodes/127.0.0.1/sdk/* conf`} />
 
           <H4>第四步. 准备智能合约</H4>
@@ -1164,7 +1164,7 @@ cd java-sdk-demo
 git checkout main-2.0
 ./gradlew clean build -x test
 cd dist && mkdir -p contracts/solidity
-java -cp "apps/*:lib/*:conf/" org.fisco.bcos.sdk.demo.codegen.DemoSolcToJava \${'{'}packageName{'}'}`} />
+java -cp "apps/*:lib/*:conf/" org.fisco.bcos.sdk.demo.codegen.DemoSolcToJava ${packageName}`} />
 
           <H4>附录二. sol2java.sh脚本的使用方法</H4>
           <P>控制台版本大于等于2.8.0时：</P>
@@ -1251,7 +1251,7 @@ BcosSDK sdk = context.getBean(BcosSDK.class);`} />
           <H4>配置步骤</H4>
           <UL>
             <LI>在您的应用的主目录下新建一个<IC>conf</IC>目录。</LI>
-            <LI>从节点<IC>nodes/${'{'}{'}ip{'}'}{''}/sdk/</IC>目录下的证书拷贝到新建的<IC>conf</IC>目录。</LI>
+            <LI>从节点<IC>nodes/$&#123;ip&#125;/sdk/</IC>目录下的证书拷贝到新建的<IC>conf</IC>目录。</LI>
             <LI>将配置文件config-example.toml存放在应用的主目录下。<IC>config-example.toml</IC>可以在java-sdk GitHub链接或Gitee链接的源文件以下位置找到：<IC>src/test/resources/config-example.toml</IC></LI>
             <LI>修改config-example.toml中节点的IP和端口，与您要连接的节点所匹配。</LI>
             <LI>在您的应用中使用该配置文件初始化Java SDK，您就可以开发区块链应用了。</LI>
@@ -1283,11 +1283,11 @@ BcosSDK sdk = BcosSDK.build(configFile);`} />
           <P>基于安全考虑，Java SDK与节点间采用SSL加密通信，目前同时支持非国密SSL连接以及国密SSL连接</P>
           <UL>
             <LI><IC>certPath</IC>: 证书存放路径，默认是<IC>conf</IC>目录</LI>
-            <LI><IC>caCert</IC>: CA证书路径，默认注释该配置项，该配置项注释时，当SDK与节点间采用非国密SSL连接时，默认的CA证书路径为<IC>{'$'}{'{'}certPath{'}'}/ca.crt</IC>，当SDK与节点采用国密SSL连接时，默认的CA证书路径为<IC>{'$'}{'{'}certPath{'}'}/gm/gmca.crt</IC></LI>
-            <LI><IC>sslCert</IC>: SDK证书路径，默认注释该配置项，当SDK与节点间采用非国密SSL连接时，从<IC>{'$'}{'{'}certPath{'}'}/sdk.crt</IC>加载SDK证书，当SDK与节点间采用国密SSL连接时，从<IC>{'$'}{'{'}certPath{'}'}/gm/gmsdk.crt</IC>加载SDK证书</LI>
-            <LI><IC>sslKey</IC>: SDK私钥路径，默认注释该配置项，当SDK与节点间采用非国密SSL连接时，从<IC>{'$'}{'{'}certPath{'}'}/sdk.key</IC>加载SDK私钥，SDK与节点采用国密SSL连接时，从<IC>{'$'}{'{'}certPath{'}'}/gm/gmsdk.key</IC>加载SDK私钥</LI>
-            <LI><IC>enSslCert</IC>: 国密SSL加密证书路径，仅当SDK与节点间采用国密SSL连接时，需要配置该配置项，默认从<IC>{'$'}{'{'}certPath{'}'}/gm/gmensdk.crt</IC>加载国密SSL加密证书</LI>
-            <LI><IC>enSslKey</IC>: 国密SSL加密私钥路径，仅当SDK与节点间采用国密SSL连接时，需配置该配置项，默认从<IC>{'$'}{'{'}certPath{'}'}/gm/gmensdk.key</IC>加载国密SSL加密私钥</LI>
+            <LI><IC>caCert</IC>: CA证书路径，默认注释该配置项，该配置项注释时，当SDK与节点间采用非国密SSL连接时，默认的CA证书路径为<IC>$&#123;certPath&#125;/ca.crt</IC>，当SDK与节点采用国密SSL连接时，默认的CA证书路径为<IC>$&#123;certPath&#125;/gm/gmca.crt</IC></LI>
+            <LI><IC>sslCert</IC>: SDK证书路径，默认注释该配置项，当SDK与节点间采用非国密SSL连接时，从<IC>$&#123;certPath&#125;/sdk.crt</IC>加载SDK证书，当SDK与节点间采用国密SSL连接时，从<IC>$&#123;certPath&#125;/gm/gmsdk.crt</IC>加载SDK证书</LI>
+            <LI><IC>sslKey</IC>: SDK私钥路径，默认注释该配置项，当SDK与节点间采用非国密SSL连接时，从<IC>$&#123;certPath&#125;/sdk.key</IC>加载SDK私钥，SDK与节点采用国密SSL连接时，从<IC>$&#123;certPath&#125;/gm/gmsdk.key</IC>加载SDK私钥</LI>
+            <LI><IC>enSslCert</IC>: 国密SSL加密证书路径，仅当SDK与节点间采用国密SSL连接时，需要配置该配置项，默认从<IC>$&#123;certPath&#125;/gm/gmensdk.crt</IC>加载国密SSL加密证书</LI>
+            <LI><IC>enSslKey</IC>: 国密SSL加密私钥路径，仅当SDK与节点间采用国密SSL连接时，需配置该配置项，默认从<IC>$&#123;certPath&#125;/gm/gmensdk.key</IC>加载国密SSL加密私钥</LI>
           </UL>
           <Note type="note">大部分场景仅需要配置 certPath 配置项即可，其他配置项不需额外配置</Note>
           <Note type="note">SDK与节点间SSL连接方式，可通过节点配置项 sm_crypto_channel 判断</Note>
@@ -1321,7 +1321,7 @@ certPath = "conf"                           # The certification path
 peers=["127.0.0.1:20200", "127.0.0.1:20201"]    # The peer list to connect`} />
 
           <H4>AMOP配置</H4>
-          <P>AMOP支持私有话题的功能，配置文件中提供了<IC>AMOP</IC>相关配置项于<IC>{'['}{'['}amop{']'}{']'}</IC>中。</P>
+          <P>AMOP支持私有话题的功能，配置文件中提供了<IC>AMOP</IC>相关配置项于<IC>[[amop]]</IC>中。</P>
           <P><strong className="text-white">私有话题订阅配置</strong>：AMOP私有话题订阅者需要配置私钥用于进行私有话题认证</P>
           <UL>
             <LI><IC>topicName</IC>: 私有话题名称</LI>
