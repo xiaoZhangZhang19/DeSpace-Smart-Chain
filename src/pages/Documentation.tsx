@@ -1164,7 +1164,7 @@ cd java-sdk-demo
 git checkout main-2.0
 ./gradlew clean build -x test
 cd dist && mkdir -p contracts/solidity
-java -cp "apps/*:lib/*:conf/" org.fisco.bcos.sdk.demo.codegen.DemoSolcToJava ${packageName}`} />
+java -cp "apps/*:lib/*:conf/" org.fisco.bcos.sdk.demo.codegen.DemoSolcToJava \${packageName}`} />
 
           <H4>附录二. sol2java.sh脚本的使用方法</H4>
           <P>控制台版本大于等于2.8.0时：</P>
