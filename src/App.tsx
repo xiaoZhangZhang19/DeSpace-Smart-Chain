@@ -29,6 +29,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import ContractTemplates from './pages/ContractTemplates';
 import ContractIDE from './pages/ContractIDE';
 import Documentation from './pages/Documentation';
+import JavaSDKDocs from './pages/JavaSDKDocs';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -1013,7 +1014,8 @@ export default function App() {
       <Route path="/" element={<HomePage />} />
       <Route path="/contracts" element={<ContractTemplates />} />
       <Route path="/ide"       element={<ContractIDE />} />
-      <Route path="/docs"      element={<Documentation />} />
+      <Route path="/docs"          element={<Documentation />} />
+      <Route path="/docs/java-sdk" element={<JavaSDKDocs />} />
     </Routes>
   );
 }
