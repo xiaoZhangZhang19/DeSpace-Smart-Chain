@@ -578,7 +578,7 @@ export default function Documentation() {
                 <span>开发第一个区块链应用</span>
                 <ChevronDown size={12} className={`transition-transform duration-200 ${docsExpanded ? 'rotate-0' : '-rotate-90'}`} />
               </button>
-              <div style={{ maxHeight: docsExpanded ? '600px' : '0', overflow: 'hidden', transition: 'max-height 0.3s ease' }}>
+              <div className="overflow-hidden transition-all duration-300 ease-in-out" style={{ maxHeight: docsExpanded ? '600px' : '0' }}>
                 <ul className="mt-1 space-y-0.5">
                   {navItems.filter(item => item.id !== 'intro').map((item) => (
                     <li key={item.id}>
