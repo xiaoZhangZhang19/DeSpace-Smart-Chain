@@ -30,6 +30,8 @@ import ContractTemplates from './pages/ContractTemplates';
 import ContractIDE from './pages/ContractIDE';
 import Documentation from './pages/DevelopFirstApp';
 import JavaSDKDocs from './pages/JavaSDKDocs';
+import KeyConcepts from './pages/KeyConcepts';
+import BlockchainDevConfig from './pages/BlockchainDevConfig';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -1016,6 +1018,8 @@ export default function App() {
       <Route path="/ide"       element={<ContractIDE />} />
       <Route path="/docs"          element={<Documentation />} />
       <Route path="/docs/java-sdk" element={<JavaSDKDocs />} />
+      <Route path="/docs/key-concepts"     element={<KeyConcepts />} />
+      <Route path="/docs/blockchain-config" element={<BlockchainDevConfig />} />
     </Routes>
   );
 }
