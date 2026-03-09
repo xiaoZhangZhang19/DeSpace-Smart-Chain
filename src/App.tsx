@@ -28,7 +28,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import ContractTemplates from './pages/ContractTemplates';
 import ContractIDE from './pages/ContractIDE';
-import Documentation from './pages/Documentation';
+import Documentation from './pages/DevelopFirstApp';
 import JavaSDKDocs from './pages/JavaSDKDocs';
 
 const Navbar = () => {

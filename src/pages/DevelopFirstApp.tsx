@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Database, Menu, X, Copy, Check, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Database, Menu, X, Copy, Check, ChevronRight, ChevronDown } from 'lucide-react';
 
 const CodeBlock = ({ code, language = 'bash' }: { code: string; language?: string }) => {
   const [copied, setCopied] = useState(false);
@@ -531,6 +531,8 @@ export default function Documentation() {
   const navigate = useNavigate();
   const [activeId, setActiveId] = useState('intro');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [docsExpanded, setDocsExpanded] = useState(true);
+  const [javaExpanded, setJavaExpanded] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -566,15 +568,39 @@ export default function Documentation() {
         <aside className={`fixed md:sticky top-14 z-40 h-[calc(100vh-3.5rem)] w-60 bg-[#020c18] border-r border-white/5 overflow-y-auto transition-transform duration-300 shrink-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
           <nav className="p-4">
             <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-3">目录</p>
-            <ul className="space-y-0.5">
-              {navItems.map((item) => (
-                <li key={item.id}>
-                  <button onClick={() => scrollTo(item.id)} className={`w-full text-left px-3 py-1.5 rounded-sm text-xs transition-all ${activeId === item.id ? 'bg-brand-primary/10 text-brand-primary font-bold border-l-2 border-brand-primary' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}>
-                    {item.label}
-                  </button>
-                </li>
-              ))}
-            </ul>
+
+            {/* Section 1: 开发第一个区块链应用 */}
+            <div className="mb-2">
+              <button
+                onClick={() => setDocsExpanded(!docsExpanded)}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-sm text-xs font-bold text-white bg-brand-primary/10 border-l-2 border-brand-primary transition-all hover:bg-brand-primary/20"
+              >
+                <span>开发第一个区块链应用</span>
+                <ChevronDown size={12} className={`transition-transform duration-200 ${docsExpanded ? 'rotate-0' : '-rotate-90'}`} />
+              </button>
+              {docsExpanded && (
+                <ul className="mt-1 space-y-0.5">
+                  {navItems.map((item) => (
+                    <li key={item.id}>
+                      <button onClick={() => scrollTo(item.id)} className={`w-full text-left px-3 py-1.5 rounded-sm text-xs transition-all ${activeId === item.id ? 'bg-brand-primary/10 text-brand-primary font-bold border-l-2 border-brand-primary' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}>
+                        {item.label}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Section 2: Java SDK Docs */}
+            <div>
+              <button
+                onClick={() => { setJavaExpanded(!javaExpanded); if (!javaExpanded) navigate('/docs/java-sdk'); }}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-sm text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all border-l-2 border-transparent hover:border-slate-500"
+              >
+                <span>Java SDK Docs</span>
+                <ChevronDown size={12} className={`transition-transform duration-200 ${javaExpanded ? 'rotate-0' : '-rotate-90'}`} />
+              </button>
+            </div>
           </nav>
         </aside>
 
