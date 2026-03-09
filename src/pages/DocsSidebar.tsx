@@ -156,6 +156,15 @@ export default function DocsSidebar({ activePage, activeId, scrollTo, sidebarOpe
     });
   };
 
+  const [subExpanded, setSubExpanded] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(configSubPages.map(p => [p.key, p.key === activePage]))
+  );
+
+  const toggleSubPage = (key: string, route: string) => {
+    if ((activePage as string) !== key) navigate(route);
+    setSubExpanded(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
   return (
     <aside className={`fixed md:sticky top-14 z-40 h-[calc(100vh-3.5rem)] w-60 bg-[#020c18] border-r border-white/5 overflow-y-auto transition-transform duration-300 shrink-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
       <nav className="p-4">
@@ -223,27 +232,33 @@ export default function DocsSidebar({ activePage, activeId, scrollTo, sidebarOpe
             <ul className="mt-1 space-y-0.5">
               {configSubPages.map(subPage => {
                 const isSubActive = activePage === subPage.key;
+                const isItemsExpanded = subExpanded[subPage.key];
                 return (
                   <li key={subPage.key}>
                     <button
-                      onClick={() => navigate(subPage.route)}
-                      className={`w-full text-left px-3 py-1.5 rounded-sm text-xs transition-all font-medium ${
+                      onClick={() => toggleSubPage(subPage.key, subPage.route)}
+                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-sm text-xs transition-all font-medium ${
                         isSubActive
                           ? 'bg-brand-primary/10 text-brand-primary font-bold border-l-2 border-brand-primary'
                           : 'text-slate-500 hover:text-white hover:bg-white/5'
                       }`}
                     >
-                      {subPage.label}
+                      <span>{subPage.label}</span>
+                      {subPage.items.length > 0 && (
+                        <ChevronDown size={10} className={`transition-transform duration-200 shrink-0 ${isItemsExpanded ? 'rotate-0' : '-rotate-90'}`} />
+                      )}
                     </button>
-                    {/* Show scroll items only for the active sub-page */}
-                    {isSubActive && subPage.items.length > 0 && (
+                    <div
+                      className="overflow-hidden transition-all duration-300 ease-in-out"
+                      style={{ maxHeight: isItemsExpanded ? '400px' : '0' }}
+                    >
                       <ul className="ml-3 mt-0.5 space-y-0.5">
                         {subPage.items.map(item => (
                           <li key={item.id}>
                             <button
-                              onClick={() => scrollTo(item.id)}
+                              onClick={() => isSubActive ? scrollTo(item.id) : undefined}
                               className={`w-full text-left px-3 py-1 rounded-sm text-xs transition-all ${
-                                activeId === item.id
+                                isSubActive && activeId === item.id
                                   ? 'text-brand-primary font-bold'
                                   : 'text-slate-600 hover:text-white hover:bg-white/5'
                               }`}
@@ -253,7 +268,7 @@ export default function DocsSidebar({ activePage, activeId, scrollTo, sidebarOpe
                           </li>
                         ))}
                       </ul>
-                    )}
+                    </div>
                   </li>
                 );
               })}
