@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Database, Menu, X, Copy, Check, ChevronRight } from 'lucide-react';
-import DocsSidebar, { configNavItems } from './DocsSidebar';
+import { ArrowLeft, Database, Menu, X, Copy, Check, ChevronRight, ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import DocsSidebar from './DocsSidebar';
 
 const CodeBlock = ({ code, language = 'bash' }: { code: string; language?: string }) => {
   const [copied, setCopied] = useState(false);
@@ -39,9 +40,6 @@ const Note = ({ type = 'note', children }: { type?: 'note' | 'warning' | 'tip'; 
   );
 };
 
-const H2 = ({ id, children }: { id: string; children: React.ReactNode }) => (
-  <h2 id={id} className="text-xl font-black text-white tracking-tight mt-12 mb-4 scroll-mt-20 pb-2 border-b border-white/10">{children}</h2>
-);
 const H3 = ({ id, children }: { id?: string; children: React.ReactNode }) => (
   <h3 id={id} className="text-base font-bold text-white mt-8 mb-3 scroll-mt-20">{children}</h3>
 );
@@ -57,9 +55,55 @@ const UL = ({ children }: { children: React.ReactNode }) => (
 const LI = ({ children }: { children: React.ReactNode }) => (
   <li className="flex items-start gap-2"><ChevronRight size={12} className="text-brand-primary mt-1 shrink-0" /><span>{children}</span></li>
 );
-const IC = ({ children }: { children: React.ReactNode }) => (
-  <code className="font-mono text-brand-accent text-[13px] bg-white/5 px-1.5 py-0.5 rounded">{children}</code>
+
+const Table = ({ headers, rows }: { headers: string[]; rows: string[][] }) => (
+  <div className="my-5 overflow-x-auto">
+    <table className="w-full text-xs border-collapse">
+      <thead>
+        <tr className="border-b border-white/10">
+          {headers.map((h, i) => <th key={i} className="text-left px-3 py-2 text-brand-primary font-bold uppercase tracking-widest">{h}</th>)}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row, i) => (
+          <tr key={i} className="border-b border-white/5 hover:bg-white/3">
+            {row.map((cell, j) => <td key={j} className="px-3 py-2 text-slate-400">{cell}</td>)}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
 );
+
+const CollapsibleSection = ({ id, title, defaultOpen = true, children }: { id: string; title: string; defaultOpen?: boolean; children: React.ReactNode }) => {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div>
+      <button
+        id={id}
+        onClick={() => setOpen(o => !o)}
+        className="scroll-mt-20 w-full flex items-center justify-between text-xl font-black text-white tracking-tight mt-12 mb-4 pb-2 border-b border-white/10 hover:text-brand-primary transition-colors group"
+      >
+        <span>{title}</span>
+        <ChevronDown size={18} className={`transition-transform duration-200 text-brand-primary ${open ? 'rotate-0' : '-rotate-90'}`} />
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="content"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            style={{ overflow: 'hidden' }}
+          >
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
 
 export default function BlockchainDevConfig() {
   const navigate = useNavigate();
@@ -68,17 +112,11 @@ export default function BlockchainDevConfig() {
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActiveId(entry.target.id);
-        });
-      },
+      (entries) => { entries.forEach(e => { if (e.isIntersecting) setActiveId(e.target.id); }); },
       { rootMargin: '-20% 0px -70% 0px' }
     );
-    configNavItems.forEach(({ id }) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
+    ['node-config', 'config-ini', 'config-group', 'config-mutable', 'node-management', 'cert-list', 'storage-enc', 'permission-control']
+      .forEach(id => { const el = document.getElementById(id); if (el) observer.observe(el); });
     return () => observer.disconnect();
   }, []);
 
@@ -110,412 +148,790 @@ export default function BlockchainDevConfig() {
 
           <div id="node-config" className="scroll-mt-20 mb-2">
             <div className="flex flex-wrap items-center gap-2 text-brand-primary text-xs font-bold uppercase tracking-widest mb-3">
-              <span>运维</span><span className="text-white/20">·</span>
               <span>配置管理</span><span className="text-white/20">·</span>
-              <span>节点管理</span>
+              <span>节点配置</span><span className="text-white/20">·</span>
+              <span>运维手册</span>
             </div>
             <h1 className="text-3xl font-black text-white tracking-tight mb-6">配置管理</h1>
           </div>
+          <Note type="tip">执行下文操作前，请先完成区块链网络搭建，可参考建链工具文档。</Note>
+          <P>配置管理包含以下模块：节点和账本配置（节点配置）、节点的加入/退出网络、群组变更等（组员配置）、CA黑白名单配置、存储加密、账户权限控制。</P>
 
-          <P>DeSpace 节点的配置体系采用三层结构设计，将不同生命周期和作用域的配置项分别管理，使运维人员能够灵活地在不重新建链的前提下调整网络行为。理解这三层配置的职责边界，是高效运维 DeSpace 网络的基础。</P>
+          {/* ── 节点配置 ── */}
+          <CollapsibleSection id="node-config-section" title="节点配置" defaultOpen={true}>
+            <span id="config-ini" className="scroll-mt-20 block" />
+            <H3>主配置文件 config.ini</H3>
+            <P>节点config.ini主要配置RPC、P2P、账本、证书、黑名单和日志，各配置项详细说明如下：</P>
 
-          <H2 id="node-config">节点配置</H2>
-          <P>DeSpace 节点的配置分为三个层次，各自覆盖不同的关注维度：</P>
-          <UL>
-            <LI><strong className="text-white">节点主配置（config.ini）</strong>：控制节点级别的网络通信、RPC 服务、日志级别、证书路径等全局参数。该配置对节点下所有群组生效，修改后需重启节点。</LI>
-            <LI><strong className="text-white">群组系统配置（group.X.genesis）</strong>：创世区块级别的不可变配置，记录共识算法类型、存储引擎、Gas 上限等在首次建链时确定的参数。一旦群组启动，这些参数不可更改。</LI>
-            <LI><strong className="text-white">账本可变配置（group.X.ini）</strong>：群组级别的运行时可变配置，涵盖交易池大小、共识超时、数据同步策略等可在运行期间动态调整的参数，部分参数修改后无需重启即可生效。</LI>
-          </UL>
-          <Note type="note">配置文件路径约定：主配置位于节点根目录 <IC>config.ini</IC>；群组配置位于 <IC>conf/</IC> 目录下，文件名中的 <IC>X</IC> 为群组编号（如 group.1.genesis）。</Note>
-
-          <H3 id="config-ini">主配置 config.ini</H3>
-          <P><IC>config.ini</IC> 是节点最核心的配置文件，主要包含以下几大配置域：</P>
-
-          <H4>RPC 配置</H4>
-          <UL>
-            <LI><IC>jsonrpc_listen_ip</IC>：JSON-RPC 监听 IP，建议生产环境仅监听内网地址，不对外网开放。</LI>
-            <LI><IC>jsonrpc_listen_port</IC>：JSON-RPC 监听端口，默认 8545，SDK 和控制台通过此端口与节点交互。</LI>
-            <LI><IC>channel_listen_ip</IC>：Channel 服务监听 IP，Java SDK 通过 Channel 协议连接节点。</LI>
-            <LI><IC>channel_listen_port</IC>：Channel 服务端口，默认 20200。</LI>
-          </UL>
-
-          <H4>P2P 网络配置</H4>
-          <UL>
-            <LI><IC>listen_ip</IC>：P2P 网络监听 IP，节点间通信使用。</LI>
-            <LI><IC>listen_port</IC>：P2P 监听端口，默认 30300。</LI>
-            <LI><IC>node.X</IC>：已知对等节点的 IP:Port 列表，节点启动后会主动连接这些地址并发现网络中其他节点。</LI>
-          </UL>
-
-          <H4>证书与安全</H4>
-          <UL>
-            <LI><IC>sm_crypto_channel</IC>：是否启用国密 TLS，<IC>true</IC> 表示 SDK 连接使用国密 SSL。</LI>
-            <LI><IC>ca_cert</IC>：CA 根证书路径，用于验证对端节点证书合法性。</LI>
-            <LI><IC>node_key</IC>：节点私钥路径，生产环境建议配合存储加密功能保护私钥文件。</LI>
-          </UL>
-
-          <H4>日志配置</H4>
-          <UL>
-            <LI><IC>log_level</IC>：日志级别，可选 trace / debug / info / warning / error，生产环境推荐 info。</LI>
-            <LI><IC>log_path</IC>：日志文件输出目录。</LI>
-            <LI><IC>max_log_file_size</IC>：单个日志文件的最大大小（MB），超出后自动滚动。</LI>
-          </UL>
-
-          <CodeBlock language="ini" code={`[rpc]
-    ; RPC监听地址，仅内网访问建议使用127.0.0.1
-    jsonrpc_listen_ip=0.0.0.0
-    jsonrpc_listen_port=8545
+            <H4>配置RPC</H4>
+            <UL>
+              <LI>channel_listen_ip：Channel监听IP，默认0.0.0.0</LI>
+              <LI>jsonrpc_listen_ip：RPC监听IP，默认127.0.0.1</LI>
+              <LI>channel_listen_port：Channel端口</LI>
+              <LI>jsonrpc_listen_port：JSON-RPC端口。支持IPv4和IPv6（v2.6.0+）</LI>
+            </UL>
+            <Note type="warning">出于安全考虑，建议将jsonrpc_listen_ip配置为127.0.0.1，同时通过Nginx等代理工具将外部请求转发到本地节点。</Note>
+            <CodeBlock language="ini" code={`[rpc]
     channel_listen_ip=0.0.0.0
+    jsonrpc_listen_ip=127.0.0.1
     channel_listen_port=20200
-    ; 是否使用国密SSL（仅对channel连接生效）
-    sm_crypto_channel=false
+    jsonrpc_listen_port=8545`} />
 
-[p2p]
+            <H4>配置P2P</H4>
+            <UL>
+              <LI>listen_ip：P2P监听IP，默认0.0.0.0</LI>
+              <LI>listen_port：P2P监听端口</LI>
+              <LI>node.*：需连接的节点IP:Port列表</LI>
+              <LI>enable_compress：网络压缩开关</LI>
+            </UL>
+            <Note type="note">云主机部署时，P2P的listen_ip需设置为0.0.0.0，而非公网IP。</Note>
+            <CodeBlock language="ini" code={`[p2p]
     listen_ip=0.0.0.0
     listen_port=30300
-    ; 已知节点列表，格式: node.编号=IP:Port
-    node.0=127.0.0.1:30301
-    node.1=127.0.0.1:30302
-    node.2=127.0.0.1:30303
+    node.0=127.0.0.1:30300
+    node.1=127.0.0.1:30301
+    node.2=127.0.0.1:30302
+    node.3=127.0.0.1:30303`} />
 
-[certificate]
-    ; 证书目录，存放ca.crt/node.crt/node.key
-    ca_cert=conf/ca.crt
-    node_cert=conf/node.crt
-    node_key=conf/node.key
+            <H4>配置证书信息</H4>
+            <UL>
+              <LI>data_path：证书所在目录</LI>
+              <LI>key：节点私钥路径</LI>
+              <LI>cert：证书路径</LI>
+              <LI>ca_cert：CA证书路径</LI>
+              <LI>check_cert_issuer：是否限制SDK仅连接本机构节点，默认true</LI>
+            </UL>
+            <CodeBlock language="ini" code={`[network_security]
+    data_path=conf/
+    key=node.key
+    cert=node.crt
+    ca_cert=ca.crt`} />
 
-[storage]
-    ; 存储引擎: rocksdb / mysql
-    type=rocksdb
-    max_capacity=256
+            <H4>配置黑名单列表</H4>
+            <P>配置黑名单列表，拒绝与指定节点建立连接。</P>
+            <CodeBlock language="ini" code={`[certificate_blacklist]
+    ; crl.0 should be nodeid, nodeid's length is 128
+    ;crl.0=`} />
 
-[log]
-    ; 日志级别: trace/debug/info/warning/error
-    log_level=info
+            <H4>配置日志信息</H4>
+            <UL>
+              <LI>enable：启用/禁用日志，默认true</LI>
+              <LI>log_path：日志路径</LI>
+              <LI>level：日志级别：trace/debug/info/warning/error</LI>
+              <LI>max_log_file_size：单文件大小限制，MB，默认200</LI>
+              <LI>flush：日志自动刷新</LI>
+            </UL>
+            <Note type="note">v2.11.0新增：log.format、log.enable_rotate_by_hour、log.log_name_pattern等日志按小时滚动配置。</Note>
+            <CodeBlock language="ini" code={`[log]
+    enable=true
     log_path=./log
+    level=info
     max_log_file_size=200
-    ; 是否开启统计日志
-    enable_statistic=false`} />
+    flush=true`} />
 
-          <H3 id="config-group">群组系统配置</H3>
-          <P><IC>group.X.genesis</IC> 是创世区块的配置文件，在群组首次启动时生效并永久固化到创世区块中，后续无法修改。该文件确保了联盟内所有节点对群组基础规则的一致认知。</P>
+            <H4>配置链属性</H4>
+            <UL>
+              <LI>id：链ID，默认1</LI>
+              <LI>sm_crypto：是否使用国密模式，默认false</LI>
+              <LI>sm_crypto_channel：是否与SDK使用国密SSL，默认false</LI>
+            </UL>
 
-          <H4>共识配置（不可变）</H4>
-          <UL>
-            <LI><IC>consensus_type</IC>：共识算法类型，可选 <IC>pbft</IC>（推荐）、<IC>raft</IC>、<IC>rpbft</IC>。一旦确定无法更改，选择前需充分评估业务需求。</LI>
-            <LI><IC>max_trans_num</IC>：单个区块中允许打包的最大交易数量，影响区块大小和吞吐量的平衡。</LI>
-            <LI><IC>node.X</IC>：创世区块中的初始共识节点公钥列表，这些节点构成网络的初始共识委员会。</LI>
-          </UL>
+            <H4>可选配置：落盘加密</H4>
+            <Note type="tip">开启落盘加密前，需要先完成Key Manager的部署，详见存储加密章节。</Note>
+            <CodeBlock language="ini" code={`[storage_security]
+    enable=true
+    key_manager_ip=127.0.0.1
+    key_manager_port=8150
+    cipher_data_key=ed157f4588b86d61a2e1745efe71e6ea`} />
 
-          <H4>存储与 EVM 配置（不可变）</H4>
-          <UL>
-            <LI><IC>storage_type</IC>：账本存储引擎，<IC>rocksdb</IC> 性能更高，<IC>mysql</IC> 运维更友好，需在建链前根据场景选择。</LI>
-            <LI><IC>tx_gas_limit</IC>：单笔交易的最大 Gas 上限，防止复杂合约占用过多计算资源。默认值 300000000，可根据合约复杂度适当调整。</LI>
-          </UL>
+            <H4>可选配置：流量控制</H4>
+            <UL>
+              <LI>limit_req：SDK请求速率限制，默认关闭</LI>
+              <LI>outgoing_bandwidth_limit：出带宽限制，Mbit/s，默认关闭</LI>
+            </UL>
 
-          <CodeBlock language="ini" code={`[consensus]
-    ; 共识算法: pbft / raft / rpbft，建链后不可修改
+            <span id="config-group" className="scroll-mt-20 block" />
+            <H3>群组系统配置 (group.*.genesis)</H3>
+            <P>群组系统配置位于节点目录的conf/group.{'{群组ID}'}.genesis文件，主要包括群组ID、共识配置、状态模式配置、Gas配置和EVM配置。系统配置在链启动后不可修改，需确保群组内所有节点配置一致。</P>
+
+            <H4>共识配置</H4>
+            <UL>
+              <LI>consensus_type：共识算法：pbft/raft/rpbft，默认pbft</LI>
+              <LI>max_trans_num：一个区块可打包的最大交易数，默认1000</LI>
+              <LI>consensus_timeout：PBFT超时时间，秒，默认3</LI>
+              <LI>node.idx：共识节点Node ID列表</LI>
+            </UL>
+            <Note type="warning">系统配置在链启动后不可修改，建议使用build_chain.sh工具自动生成初始配置。</Note>
+            <CodeBlock language="ini" code={`[consensus]
     consensus_type=pbft
-    ; 单区块最大交易数
     max_trans_num=1000
-    ; 初始共识节点公钥列表（与证书中的公钥对应）
-    node.0=1cf34...pubkey1...
-    node.1=7ab82...pubkey2...
-    node.2=e53d1...pubkey3...
-    node.3=90f47...pubkey4...
+    consensus_timeout=3
+    node.0=xxx...（节点0的NodeID）
+    node.1=xxx...（节点1的NodeID）`} />
 
-[storage]
-    ; 存储引擎: rocksdb / mysql，建链后不可修改
-    type=rocksdb
+            <H4>状态模式配置</H4>
+            <CodeBlock language="ini" code={`[state]
+    type=storage`} />
 
-[tx]
-    ; 单笔交易Gas上限
-    gas_limit=300000000`} />
+            <H4>Gas配置 & EVM配置</H4>
+            <CodeBlock language="ini" code={`[tx]
+    gas_limit=300000000
 
-          <Note type="tip">群组系统配置文件 group.X.genesis 在各节点中必须完全一致，否则节点将无法加入同一群组。建议使用 build_chain.sh 自动生成，避免手动配置引入差异。</Note>
+[evm]
+    enable_free_storage=false`} />
 
-          <H3 id="config-mutable">账本可变配置</H3>
-          <P><IC>group.X.ini</IC> 中的参数可在网络运行期间动态调整，部分参数无需重启节点即可热生效。合理配置这些参数对于优化网络性能和稳定性至关重要。</P>
+            <span id="config-mutable" className="scroll-mt-20 block" />
+            <H3>账本可变配置 (group.*.ini)</H3>
+            <P>账本可变配置位于nodes/conf/group.{'{群组ID}'}.ini，支持运行时动态调整。</P>
 
-          <H4>共识运行参数</H4>
-          <UL>
-            <LI><IC>consensus_timeout</IC>：共识超时时间（毫秒），Leader 节点在该时间内未完成出块则触发视图切换。值越小网络响应越快，但在高负载下可能频繁触发视图切换，建议根据网络延迟调整，默认 3000ms。</LI>
-            <LI><IC>min_seal_time</IC>：最短出块间隔（毫秒），即使交易池有待打包交易，节点也至少等待此时间再出块，用于积累更多交易提升 TPS。</LI>
-          </UL>
+            <H4>配置storage</H4>
+            <UL>
+              <LI>type：存储类型：RocksDB/MySQL/Scalable，推荐MySQL直连</LI>
+              <LI>max_capacity：内存缓存大小</LI>
+              <LI>max_forward_block：内存区块大小</LI>
+              <LI>binary_log：是否打开二进制日志</LI>
+              <LI>db_ip/port/username/passwd/name：MySQL连接信息</LI>
+            </UL>
 
-          <H4>交易池配置</H4>
-          <UL>
-            <LI><IC>tx_pool_size</IC>：内存中交易池的最大容量（交易数），超出后新交易将被拒绝。高并发场景下需适当增大，但需注意内存消耗。</LI>
-            <LI><IC>tx_pool_limit</IC>：交易池限流配置，防止单个客户端提交过多未确认交易。</LI>
-          </UL>
+            <H4>交易池配置</H4>
+            <UL>
+              <LI>limit：交易池最大交易数，默认150000</LI>
+              <LI>memory_limit：交易池内存大小限制，MB，默认512</LI>
+              <LI>notify_worker_num：异步推送线程数，默认2</LI>
+              <LI>txs_expiration_time：交易过期时间，秒，默认600</LI>
+            </UL>
 
-          <H4>同步配置</H4>
-          <UL>
-            <LI><IC>sync_block_num</IC>：每次同步的区块数量上限，新节点加入时通过此参数控制追块速度。</LI>
-            <LI><IC>enable_ttl_pruning</IC>：是否启用历史数据 TTL 裁剪，开启后可定期清理过期的历史状态，节约存储空间。</LI>
-          </UL>
+            <H4>PBFT共识配置</H4>
+            <UL>
+              <LI>ttl：消息最大转发次数</LI>
+              <LI>min_block_generation_time：最短打包时间，ms，默认500</LI>
+              <LI>enable_dynamic_block_size：是否开启交易数动态调整，默认true</LI>
+            </UL>
 
-          <CodeBlock language="ini" code={`[consensus]
-    ; 共识超时时间(ms)，默认3000，根据网络延迟调整
-    consensus_timeout=3000
-    ; 最短出块间隔(ms)，0表示有交易立即出块
-    min_seal_time=500
+            <H4>同步配置</H4>
+            <UL>
+              <LI>sync_block_by_tree：区块树状广播优化，v2.2.0+默认true</LI>
+              <LI>gossip_interval_ms：Gossip同步周期，ms，默认1000</LI>
+              <LI>send_txs_by_tree：交易树状广播，v2.2.0+默认true</LI>
+            </UL>
 
-[tx_pool]
-    ; 交易池最大容量（交易数量）
-    tx_pool_size=150000
-    ; 单个连接最大pending交易数
-    tx_pool_limit=15000
-
-[sync]
-    ; 每次同步最大区块数
-    sync_block_num=50
-    ; 是否开启idle同步（无新交易时同步）
-    idle_wait_ms=200
-
-[storage]
-    ; 是否开启历史状态裁剪（节约存储空间）
-    enable_ttl_pruning=false
-    ; 数据保留的最大区块数（仅enable_ttl_pruning=true时生效）
-    ttl=100000`} />
-          <Note type="note">修改 group.X.ini 中的参数后，向节点进程发送 SIGUSR2 信号（<IC>kill -USR2 &lt;pid&gt;</IC>）即可热加载部分配置，无需重启节点。具体哪些参数支持热加载请参考各版本发布说明。</Note>
+            <H4>动态系统参数</H4>
+            <P>通过控制台命令 setSystemConfigByKey / getSystemConfigByKey 修改以下参数：</P>
+            <Table
+              headers={['参数', '默认值', '说明']}
+              rows={[
+                ['tx_count_limit', '1000', '一个区块可打包的最大交易数'],
+                ['tx_gas_limit', '300000000', '交易最大gas限制'],
+                ['rpbft_epoch_sealer_num', '链共识节点总数', 'rPBFT共识周期选取节点数'],
+                ['rpbft_epoch_block_num', '1000', 'rPBFT共识周期出块数'],
+                ['consensus_timeout', '3', 'PBFT区块执行超时时间（秒）'],
+              ]}
+            />
+          </CollapsibleSection>
 
           {/* ── 组员节点管理 ── */}
-          <H2 id="node-management">组员节点管理</H2>
-          <P>DeSpace 支持在不中断网络的情况下动态管理群组内的节点成员，包括新增共识节点、新增观察者节点、移除节点等操作。节点角色的变更通过向预编译合约发送交易实现，操作记录上链，全网可见。</P>
+          <CollapsibleSection id="node-management" title="组员节点管理" defaultOpen={true}>
+            <P>本章介绍区块链节点的加入和退出操作，包括节点加入/退出网络和节点加入/退出群组。</P>
 
-          <H4>节点角色说明</H4>
-          <UL>
-            <LI><strong className="text-white">共识节点（Sealer）</strong>：参与 PBFT/Raft 共识投票，具有提议和确认区块的权利。共识节点数量直接影响网络的容错能力（PBFT 要求不少于 3f+1 个节点，其中 f 为最大容错节点数）和出块速度。</LI>
-            <LI><strong className="text-white">观察者节点（Observer）</strong>：同步群组内所有区块和交易数据，但不参与共识投票。适合用于数据查询服务、业务系统只读接入，不影响共识性能。</LI>
-            <LI><strong className="text-white">游离节点（Free Node）</strong>：节点已在 P2P 网络中连接，但尚未加入任何群组，处于待分配状态。游离节点不同步任何群组数据。</LI>
-          </UL>
+            <H3>节点类型</H3>
+            <P>FISCO BCOS区块链节点分为以下三种类型：</P>
+            <UL>
+              <LI>共识节点：参与共识，拥有群组完整数据</LI>
+              <LI>观察者节点：不参与共识但实时同步链上数据</LI>
+              <LI>游离节点：已启动但未加入任何群组的临时节点状态</LI>
+            </UL>
 
-          <H4>节点管理命令</H4>
-          <P>通过控制台（console）执行以下命令管理群组节点成员：</P>
-          <CodeBlock language="bash" code={`# 将节点加入为共识节点（Sealer）
-> addSealer <nodeId>
-# 示例
-> addSealer 1cf34b2a...node_public_key...
+            <H3>操作命令</H3>
+            <P>控制台提供以下六个主要节点管理命令：</P>
+            <Table
+              headers={['命令', '功能']}
+              rows={[
+                ['addSealer <nodeID>', '将节点转换为共识节点'],
+                ['addObserver <nodeID>', '将节点转换为观察者节点'],
+                ['removeNode <nodeID>', '将节点转换为游离节点'],
+                ['getSealerList', '查询当前共识节点列表'],
+                ['getObserverList', '查询当前观察者节点列表'],
+                ['getNodeIDList', '查询当前连接的节点列表'],
+              ]}
+            />
+            <Note type="note">操作前请确认节点ID存在（可通过 cat conf/node.nodeid 获取），且区块链共识运行正常。</Note>
 
-# 将节点加入为观察者节点（Observer）
-> addObserver <nodeId>
-> addObserver 7ab824c9...node_public_key...
+            <H3>A节点加入网络</H3>
+            <P>生成新节点证书，配置P2P端口，并在现有节点的config.ini中添加新节点IP:Port。</P>
+            <CodeBlock language="bash" code={`# 在现有节点的config.ini中添加新节点
+[p2p]
+    node.N=新节点IP:Port
 
-# 将节点从群组中移除（变为游离节点）
-> removeNode <nodeId>
-> removeNode 1cf34b2a...node_public_key...
+# 重启节点使P2P配置生效
+bash stop.sh && bash start.sh`} />
 
-# 查询当前共识节点列表
-> getSealerList
+            <H3>A节点加入群组</H3>
+            <P>在控制台中使用addSealer或addObserver命令将节点加入群组：</P>
+            <CodeBlock language="bash" code={`# 连接控制台
+cd ~/fisco/console && bash start.sh
 
-# 查询当前观察者节点列表
-> getObserverList
+# 获取节点NodeID
+[group:1]> getNodeIDList
 
-# 查询网络中所有已连接节点（包含游离节点）
-> getNodeIDList`} />
+# 添加为共识节点
+[group:1]> addSealer {nodeID}
 
-          <H4>新节点加入网络的操作步骤</H4>
-          <UL>
-            <LI><strong className="text-white">第一步：生成节点证书与配置</strong> — 使用 <IC>build_chain.sh -o add</IC> 或手动生成节点配置目录，确保新节点持有由联盟 CA 签发的合法证书。</LI>
-            <LI><strong className="text-white">第二步：启动新节点</strong> — 在新节点机器上执行 <IC>start.sh</IC> 启动节点进程，节点将通过 P2P 网络发现并连接已有节点，此时状态为游离节点。</LI>
-            <LI><strong className="text-white">第三步：确认 P2P 连接</strong> — 在控制台执行 <IC>getNodeIDList</IC>，确认新节点的 NodeID 出现在列表中，说明 P2P 连接已建立。</LI>
-            <LI><strong className="text-white">第四步：添加为观察者节点</strong> — 执行 <IC>addObserver &lt;nodeId&gt;</IC>，将新节点加入群组作为观察者，节点开始同步历史区块数据。</LI>
-            <LI><strong className="text-white">第五步：等待区块同步完成</strong> — 通过 <IC>getSyncStatus</IC> 查看新节点的区块高度，等待其同步至最新高度。</LI>
-            <LI><strong className="text-white">第六步（可选）：提升为共识节点</strong> — 同步完成后，若需要参与共识，执行 <IC>addSealer &lt;nodeId&gt;</IC> 将其升级为共识节点。</LI>
-          </UL>
-          <Note type="warning">将节点提升为共识节点会增加共识通信量，请在确认节点稳定运行、网络带宽充裕后再执行此操作，避免因新节点性能不足影响整体共识效率。</Note>
+# 或添加为观察者节点
+[group:1]> addObserver {nodeID}`} />
 
-          {/* ── CA黑白名单 ── */}
-          <H2 id="cert-list">CA 黑白名单配置</H2>
-          <P>DeSpace 提供基于节点证书的黑白名单机制，允许运维人员在不更换证书体系的前提下，对特定节点的网络接入进行精细控制。黑白名单在 TLS 握手阶段生效，被拒绝的节点无法建立 P2P 或 Channel 连接。</P>
+            <H3>A节点退出群组</H3>
+            <CodeBlock language="bash" code={`# 将节点转为游离节点
+[group:1]> removeNode {nodeID}`} />
 
-          <H4>黑名单（Certificate Blacklist）</H4>
-          <P>黑名单用于拒绝特定节点的连接请求，即使该节点持有合法的 CA 证书。适用场景：某节点发生安全事件（私钥泄露、被恶意控制）需要立即隔离，但尚未完成证书吊销流程时，可先通过黑名单紧急阻断其连接。</P>
+            <H3>A节点退出网络</H3>
+            <P>节点退出网络前需先退出所有群组。从其他节点的config.ini中移除该节点的IP:Port配置，并重启相关节点。</P>
+            <Note type="warning">操作顺序必须为：先退出群组，再退出网络。直接退出网络可能导致群组共识异常。</Note>
+          </CollapsibleSection>
 
-          <H4>白名单（Certificate Whitelist）</H4>
-          <P>白名单用于实现"最小权限"接入策略：仅允许白名单中列出的节点连接，其他所有节点（即使证书合法）均被拒绝。适用于对接入节点有严格管控要求的高安全场景。</P>
+          {/* ── CA黑白名单配置 ── */}
+          <CollapsibleSection id="cert-list" title="CA黑白名单配置" defaultOpen={true}>
+            <P>通过配置CA黑白名单，可以控制节点的连接权限，实现节点间连接的精细化管理。</P>
 
-          <H4>优先级规则</H4>
-          <UL>
-            <LI>黑名单优先级高于白名单：若某节点同时出现在黑名单和白名单中，以黑名单为准，该节点被拒绝连接。</LI>
-            <LI>若仅配置白名单（黑名单为空），则只有白名单节点可连接。</LI>
-            <LI>若两者均未配置，则所有持有合法 CA 证书的节点均可连接（默认行为）。</LI>
-          </UL>
+            <H3>黑名单</H3>
+            <P>通过配置黑名单，可以拒绝与指定节点建立连接。在节点conf/config.ini中配置：</P>
+            <CodeBlock language="ini" code={`[certificate_blacklist]
+    ; crl.0 should be nodeid, nodeid's length is 128
+    ;crl.0=`} />
+            <P>配置生效需重启节点：</P>
+            <CodeBlock language="bash" code={`$ bash stop.sh && bash start.sh`} />
+            <P>查看节点连接状态：</P>
+            <CodeBlock language="bash" code={`$ curl -X POST --data '{"jsonrpc":"2.0","method":"getPeers","params":[1],"id":1}' http://127.0.0.1:8545 |jq`} />
 
-          <CodeBlock language="ini" code={`; 在 config.ini 中配置黑白名单
-[certificate_blacklist]
-    ; 拒绝连接的节点证书序列号（Certificate Serial Number），可配置多个
-    ; 格式: crl.编号=证书序列号
-    crl.0=4B:3D:99:E5:00:12:9A:F2:AB:CD:12:34:56:78:90:AB
-    crl.1=1A:2B:3C:4D:5E:6F:AA:BB:CC:DD:EE:FF:00:11:22:33
+            <H3>白名单</H3>
+            <P>通过配置白名单，节点只与白名单内的节点建立连接，拒绝白名单之外的节点。不配置表示白名单关闭。</P>
+            <CodeBlock language="ini" code={`[certificate_whitelist]
+    ; cal.0 should be nodeid, nodeid's length is 128
+    cal.0=7718df20f0f7e27fdab97b3d69deebb6e289b07eb7799c7ba92fe2f43d2efb4c1250dd1f11fa5b5ce687c8283d65030aae8680093275640861bc274b1b2874cb
+    cal.1=f306eb1066ceb9d46e3b77d2833a1bde2a9899cfc4d0433d64b01d03e79927aa60a40507c5739591b8122ee609cf5636e71b02ce5009f3b8361930ecc3a9abb0`} />
+            <P>白名单支持动态刷新，无需重启节点：</P>
+            <CodeBlock language="bash" code={`# 若节点未启动
+$ bash start.sh
+# 若节点已启动，动态刷新白名单
+$ cd scripts && bash reload_whitelist.sh`} />
+
+            <H3>使用场景：公共CA</H3>
+            <P>当多条链共用同一个CA证书（如CFCA颁发的证书）时，无关链的节点可能互相连接。此时需启用白名单功能，防止跨链节点连接。</P>
+
+            <H4>搭链步骤</H4>
+            <UL>
+              <LI>使用工具搭建区块链网络</LI>
+              <LI>查询所有节点NodeID</LI>
+              <LI>将所有NodeID配置入每个节点的白名单</LI>
+              <LI>启动节点或执行reload_whitelist.sh刷新配置</LI>
+            </UL>
+
+            <H4>扩容步骤</H4>
+            <UL>
+              <LI>使用工具扩容新节点</LI>
+              <LI>查询扩容节点NodeID</LI>
+              <LI>将此NodeID追加到所有现有节点白名单配置</LI>
+              <LI>将其他节点白名单配置拷贝到新节点</LI>
+              <LI>执行reload_whitelist.sh刷新已启动节点白名单</LI>
+              <LI>启动扩容节点</LI>
+              <LI>通过addSealer或addObserver将新节点加入群组</LI>
+            </UL>
+
+            <H3>黑白名单操作举例</H3>
+
+            <H4>准备</H4>
+            <P>搭建4节点区块链网络并记录各节点NodeID：</P>
+            <CodeBlock language="bash" code={`bash build_chain.sh -l 127.0.0.1:4
+
+# 查看节点NodeID
+$ cat node*/conf/node.nodeid
+219b319ba7b2b3a1ecfa7130ea314410a52c537e6e7dda9da46dec492102aa5a43bad81679b6af0cd5b9feb7cfdc0b395cfb50016f56806a2afc7ee81bbb09bf
+7718df20f0f7e27fdab97b3d69deebb6e289b07eb7799c7ba92fe2f43d2efb4c1250dd1f11fa5b5ce687c8283d65030aae8680093275640861bc274b1b2874cb
+f306eb1066ceb9d46e3b77d2833a1bde2a9899cfc4d0433d64b01d03e79927aa60a40507c5739591b8122ee609cf5636e71b02ce5009f3b8361930ecc3a9abb0
+38158ef34eb2d58ce1d31c8f3ef9f1fa829d0eb8ed1657f4b2a3ebd3265d44b243c69ffee0519c143dd67e91572ea8cb4e409144a1865f3e980c22d33d443296`} />
+            <P>节点标识：node0: 219b319b…，node1: 7718df20…，node2: f306eb10…，node3: 38158ef3…</P>
+
+            <H4>场景1：配置黑名单（node0拒绝node1的连接）</H4>
+            <CodeBlock language="ini" code={`[certificate_blacklist]
+    crl.0=7718df20f0f7e27fdab97b3d69deebb6e289b07eb7799c7ba92fe2f43d2efb4c1250dd1f11fa5b5ce687c8283d65030aae8680093275640861bc274b1b2874cb
 
 [certificate_whitelist]
-    ; 仅允许连接的节点证书序列号，配置后其他节点均被拒绝
-    ; 若不需要白名单则注释此段
-    ; cal.0=FF:EE:DD:CC:BB:AA:99:88:77:66:55:44:33:22:11:00`} />
+    ; cal.0=`} />
+            <P>重启node0后，node0仅连接node2和node3，不与node1建立连接。</P>
 
-          <P>修改黑白名单配置后，向节点进程发送 <IC>SIGUSR1</IC> 信号即可热加载，无需重启节点：</P>
-          <CodeBlock language="bash" code={`# 获取节点进程PID
-cat nodes/127.0.0.1/node0/node.pid
+            <H4>场景2：配置白名单（node0仅与node1、node2连接）</H4>
+            <CodeBlock language="ini" code={`[certificate_blacklist]
+    ;crl.0=
 
-# 发送热加载信号（替换 <pid> 为实际进程号）
-kill -USR1 <pid>
+[certificate_whitelist]
+    cal.0=7718df20f0f7e27fdab97b3d69deebb6e289b07eb7799c7ba92fe2f43d2efb4c1250dd1f11fa5b5ce687c8283d65030aae8680093275640861bc274b1b2874cb
+    cal.1=f306eb1066ceb9d46e3b77d2833a1bde2a9899cfc4d0433d64b01d03e79927aa60a40507c5739591b8122ee609cf5636e71b02ce5009f3b8361930ecc3a9abb0`} />
+            <P>重启后，node0仅连接node1和node2，不与node3建立连接。</P>
 
-# 确认热加载成功（查看日志中的reload信息）
-tail -f nodes/127.0.0.1/node0/log/log_*.log | grep -i "reload"`} />
-          <Note type="note">黑白名单配置基于证书序列号（Serial Number）而非节点 NodeID，需通过 <IC>openssl x509 -in node.crt -noout -serial</IC> 命令获取证书序列号。</Note>
+            <H4>场景3：黑白名单混合配置（黑名单优先级高）</H4>
+            <CodeBlock language="ini" code={`[certificate_blacklist]
+    crl.0=7718df20f0f7e27fdab97b3d69deebb6e289b07eb7799c7ba92fe2f43d2efb4c1250dd1f11fa5b5ce687c8283d65030aae8680093275640861bc274b1b2874cb
+
+[certificate_whitelist]
+    cal.0=7718df20f0f7e27fdab97b3d69deebb6e289b07eb7799c7ba92fe2f43d2efb4c1250dd1f11fa5b5ce687c8283d65030aae8680093275640861bc274b1b2874cb
+    cal.1=f306eb1066ceb9d46e3b77d2833a1bde2a9899cfc4d0433d64b01d03e79927aa60a40507c5739591b8122ee609cf5636e71b02ce5009f3b8361930ecc3a9abb0`} />
+            <P>即使白名单包含node1，由于黑名单优先级更高，node0仍不与node1建立连接，仅连接node2。</P>
+          </CollapsibleSection>
 
           {/* ── 存储加密 ── */}
-          <H2 id="storage-enc">存储加密</H2>
-          <P>存储加密功能用于保护节点本地存储的敏感数据（账本数据、节点私钥），防止因物理介质被盗、云环境磁盘快照泄露等原因导致数据暴露。DeSpace 通过独立的 Key Manager 服务集中管理加密密钥，节点运行时从 Key Manager 获取解密密钥，Key Manager 宕机时节点无法启动（强制保护）。</P>
+          <CollapsibleSection id="storage-enc" title="存储加密" defaultOpen={true}>
+            <P>联盟链数据仅对联盟成员可见。落盘加密保障了联盟链运维数据在硬盘上的安全性。一旦硬盘脱离联盟链内网环境，数据将无法被解密。落盘加密对节点存储在硬盘上的内容进行加密，加密内容包括：合约数据以及节点私钥文件。</P>
+            <Note type="warning">国密版节点需使用对应的国密版Key Manager。节点必须在首次运行前完成落盘加密配置，一旦节点开始运行则无法切换加密状态。</Note>
 
-          <H4>第一步：部署 Key Manager 服务</H4>
-          <CodeBlock language="bash" code={`# 下载Key Manager
-cd ~/fisco
-curl -#LO https://github.com/FISCO-BCOS/key-manager/releases/download/v2.9.0/key-manager.tar.gz
-tar -xzf key-manager.tar.gz && cd key-manager
+            <H3>第一步. 部署Key Manager</H3>
+            <P>每个机构部署一个Key Manager。具体部署步骤请参考Key Manager GitHub README或Key Manager Gitee README。</P>
 
-# 初始化Key Manager（生成主密钥）
-./key-manager --init --output ./data
-# 输出: masterKey已生成并存储于 ./data/masterKey.key
+            <H3>第二步. 生成节点</H3>
+            <CodeBlock language="bash" code={`curl -#LO https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v2.11.0/build_chain.sh && chmod u+x build_chain.sh
+bash build_chain.sh -l 127.0.0.1:4 -p 30300,20200,8545`} />
+            <Note type="warning">节点生成后不能直接启动，需完成dataKey配置后再启动。</Note>
 
-# 查看Key Manager监听端口（默认 8150）
-cat conf/key-manager.ini | grep listen_port`} />
+            <H3>第三步. 启动Key Manager</H3>
+            <CodeBlock language="bash" code={`./key-manager 8150 123xyz`} />
+            <P>成功启动后输出：</P>
+            <CodeBlock language="bash" code={`[1546501342949][TRACE][Load]key-manager started,port=8150`} />
 
-          <H4>第二步：生成启用加密的节点</H4>
-          <CodeBlock language="bash" code={`# 使用 build_chain.sh 生成节点时指定加密参数
-bash build_chain.sh -l "127.0.0.1:4" -p 30300,20200,8545 -e ./fisco-bcos -K 127.0.0.1:8150
-# -K 参数指定Key Manager的地址和端口`} />
+            <H3>第四步. 配置dataKey</H3>
+            <Note type="note">配置dataKey的节点必须是新生成、从未启动过的节点。</Note>
+            <CodeBlock language="bash" code={`cd key-manager/scripts
+bash gen_data_secure_key.sh 127.0.0.1 8150 123456`} />
+            <P>脚本输出加密配置，示例如下：</P>
+            <CodeBlock language="bash" code={`CiherDataKey generated: ed157f4588b86d61a2e1745efe71e6ea
+Append these into config.ini to enable disk encryption:
+[storage_security]
+enable=true
+key_manager_ip=127.0.0.1
+key_manager_port=8150
+cipher_data_key=ed157f4588b86d61a2e1745efe71e6ea`} />
+            <P>将以上落盘加密配置写入节点的config.ini文件：</P>
+            <CodeBlock language="bash" code={`vim nodes/127.0.0.1/node0/config.ini`} />
 
-          <H4>第三步：启动 Key Manager</H4>
-          <CodeBlock language="bash" code={`cd ~/fisco/key-manager
-# 前台启动（测试用）
-./key-manager
-# 后台启动
-nohup ./key-manager >> key-manager.log 2>&1 &
-echo $! > key-manager.pid
+            <H3>第五步. 加密节点私钥</H3>
+            <Note type="tip">若使用内置HSM密钥，可跳过此步骤。</Note>
+            <CodeBlock language="bash" code={`cd key-manager/scripts
+bash encrypt_node_key.sh 127.0.0.1 8150 ../../nodes/127.0.0.1/node0/conf/node.key ed157f4588b86d61a2e1745efe71e6ea`} />
+            <P>加密成功输出：</P>
+            <CodeBlock language="bash" code={`[INFO] File backup to "nodes/127.0.0.1/node0/conf/node.key.bak.1546502474"
+[INFO] "nodes/127.0.0.1/node0/conf/node.key" encrypted!`} />
+            <Note type="warning">需要加密的文件：非国密版为 conf/node.key；国密版为 conf/gmnode.key 和 conf/origin_cert/node.key。未加密将导致节点无法启动。</Note>
 
-# 验证Key Manager正常运行
-curl http://127.0.0.1:8150/encrypt -X POST -d '{"dataKey":"test","data":"hello"}'`} />
+            <H3>第六步. 节点运行</H3>
+            <CodeBlock language="bash" code={`cd nodes/127.0.0.1/node0/
+./start.sh`} />
 
-          <H4>第四步：配置节点 dataKey</H4>
-          <P>每个节点需要独立的 <IC>dataKey</IC> 用于加密其本地存储数据。dataKey 由 Key Manager 托管，节点启动时通过安全通道获取。</P>
-          <CodeBlock language="bash" code={`# 为节点0注册dataKey（通过Key Manager API）
-curl http://127.0.0.1:8150/newDataKey \
-  -X POST \
-  -H 'Content-Type: application/json' \
-  -d '{"nodeId": "node0", "groupId": "1"}'
-# 返回: {"dataKey":"aes_key_hex...","encryptedDataKey":"cipher..."}
-
-# 将返回的 encryptedDataKey 写入节点配置
-echo "encryptedDataKey=cipher..." >> nodes/127.0.0.1/node0/conf/node.key.conf`} />
-
-          <H4>第五步：加密节点私钥</H4>
-          <CodeBlock language="bash" code={`# 使用Key Manager工具加密节点私钥
-./key-manager --encrypt-node-key \
-  --key-manager 127.0.0.1:8150 \
-  --node-key nodes/127.0.0.1/node0/conf/node.key \
-  --output nodes/127.0.0.1/node0/conf/node.key.enc
-
-# 在节点config.ini中指定使用加密私钥
-# [certificate]
-#   node_key=conf/node.key.enc
-#   enable_key_manager=true
-#   key_manager_url=127.0.0.1:8150`} />
-
-          <H4>第六步：启动节点</H4>
-          <CodeBlock language="bash" code={`# 确保Key Manager已启动后，再启动节点
-cd nodes/127.0.0.1/node0 && bash start.sh
-
-# 节点启动时会向Key Manager请求密钥，日志中应看到：
-# [INFO][KeyManager] Successfully fetched dataKey from key-manager
-# [INFO][Storage] Storage encryption enabled`} />
-
-          <H4>第七步：验证加密正确性</H4>
-          <CodeBlock language="bash" code={`# 方法1: 通过控制台验证节点正常运行并可以查询
-./console/start.sh
-> getBlockNumber
-# 返回正常区块高度则说明加密存储运行正常
-
-# 方法2: 直接检查RocksDB数据文件（加密后内容应为乱码）
-xxd nodes/127.0.0.1/node0/data/group1/block/ | head -5
-# 若输出为加密数据（非可读文本），说明存储加密生效
-
-# 方法3: 停止Key Manager后尝试重启节点（应失败）
-kill $(cat key-manager.pid)
-cd nodes/127.0.0.1/node0 && bash start.sh
-# 预期: 节点启动失败，日志提示无法连接Key Manager`} />
-          <Note type="tip">存储加密一旦启用，Key Manager 服务的高可用性将直接影响节点的启动能力。生产环境务必为 Key Manager 配置主备架构，防止单点故障导致所有节点无法重启。</Note>
+            <H3>第七步. 正确性判断</H3>
+            <P>验证方式1：节点正常运行，持续输出共识打包信息：</P>
+            <CodeBlock language="bash" code={`tail -f nodes/127.0.0.1/node0/log/* | grep +++`} />
+            <P>验证方式2：Key Manager每次节点启动时打印一条日志：</P>
+            <CodeBlock language="bash" code={`[1546504272699][TRACE][Dec]Respond
+{
+   "dataKey" : "313233343536",
+   "error" : 0,
+   "info" : "success"
+}`} />
+          </CollapsibleSection>
 
           {/* ── 账户权限控制 ── */}
-          <H2 id="permission-control">账户权限控制</H2>
-          <P>DeSpace 基于角色的权限控制（RBAC）模型，将链的管理权限划分为两个层级：委员（Committee Member）和运维（Operator），并通过链上治理合约（<IC>PermissionPrecompiled</IC>）执行权限变更，所有操作可审计、可追溯。</P>
+          <CollapsibleSection id="permission-control" title="账户权限控制" defaultOpen={true}>
 
-          <H4>角色权限说明</H4>
-          <UL>
-            <LI><strong className="text-white">委员（Committee Member）</strong>：拥有最高治理权限，可以授权/撤销运维账户、修改委员会成员列表（需多签投票）、修改阈值等。委员账户通常由联盟内各机构的权威账户担任。</LI>
-            <LI><strong className="text-white">运维（Operator）</strong>：由委员授权，拥有部署合约、冻结/解冻合约、管理节点成员等日常运维操作权限，但无权变更委员会组成。</LI>
-            <LI><strong className="text-white">普通账户</strong>：无特殊权限，只能调用已部署的合约（需要合约自身的业务权限逻辑允许），不能部署新合约（在启用权限管理后）。</LI>
-          </UL>
+            <h2 className="text-xl font-black text-white tracking-tight mt-10 mb-4 pb-2 border-b border-white/10">基于角色的权限控制</h2>
 
-          <H4>委员会管理命令</H4>
-          <CodeBlock language="bash" code={`# 授予账户委员权限（需要现有委员发起，多签投票通过）
-> grantCommitteeMember 0xABCD...账户地址...
-# 发起投票后，其他委员需执行 voteCommitteeMember 进行投票
-> voteCommitteeMember 0xABCD...账户地址... true
+            <P>本节描述角色权限控制的操作，2.5.0版本开始提供基于角色的权限控制模型，原来的链管理员相当于当前的治理委员会委员角色，拥有链治理相关的操作权限。用户不需要关注底层系统表对应的权限，只需关注角色的权限即可。</P>
 
-# 撤销委员权限
-> revokeCommitteeMember 0xABCD...账户地址...
+            <H3>权限与角色</H3>
+            <UL>
+              <LI>链治理委员会委员（简称委员）</LI>
+              <LI>权限使用白名单机制，默认不检查，当存在至少一个角色的账号时，角色对应的权限检查生效</LI>
+              <LI>委员可以冻结解冻任意合约，同时合约的部署账号也可以冻结解冻合约</LI>
+              <LI>委员可以冻结解冻账号，被冻结的账号无法发送交易</LI>
+            </UL>
 
-# 查询委员列表
-> listCommitteeMembers
+            <H3>权限操作表</H3>
+            <Table
+              headers={['权限操作', '修改方式']}
+              rows={[
+                ['增删委员', '委员投票'],
+                ['修改委员权重', '委员投票'],
+                ['修改生效投票阈值（投票委员权重和大于该值）', '委员投票'],
+                ['增删节点（观察/共识）', '委员账号'],
+                ['修改链配置项', '委员账号'],
+                ['冻结解冻合约', '委员账号'],
+                ['冻结解冻账号', '委员账号'],
+                ['添加撤销运维', '委员账号'],
+                ['用户表的写权限', '委员账号'],
+                ['部署合约', '运维账号'],
+                ['创建表', '运维账号'],
+                ['合约版本管理', '运维账号'],
+                ['冻结解冻本账号部署的合约', '运维账号'],
+                ['调用合约写接口', '有管理合约生命周期权限的账号'],
+              ]}
+            />
 
-# 修改委员会投票通过阈值（默认50%）
-> updateThreshold 66  ; 设置为66%多数通过`} />
+            <H3>环境配置</H3>
+            <P>配置并启动FISCO BCOS 2.0区块链节点和控制台，请参考安装文档。</P>
 
-          <H4>运维账户管理命令</H4>
-          <CodeBlock language="bash" code={`# 授予账户运维权限（委员执行）
-> grantOperator 0x1234...运维账户...
+            <H3>权限控制示例账户</H3>
+            <P>控制台提供账户生成脚本get_account.sh，生成的账户文件在accounts目录下，控制台可以指定账户启动。在控制台根目录下通过get_account.sh脚本生成三个PEM格式的账户文件如下：</P>
+            <CodeBlock language="bash" code={`# 账户1
+0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a.pem
+# 账户2
+0x85961172229aec21694d742a5bd577bedffcfec3.pem
+# 账户3
+0x0b6f526d797425540ea70becd7adac7d50f4a7c0.pem`} />
+            <P>打开三个连接Linux的终端，分别以三个账户登录控制台：</P>
+            <CodeBlock language="bash" code={`# 指定账户1登录
+./start.sh 1 -pem accounts/0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a.pem
+# 指定账户2登录
+./start.sh 1 -pem accounts/0x85961172229aec21694d742a5bd577bedffcfec3.pem
+# 指定账户3登录
+./start.sh 1 -pem accounts/0x0b6f526d797425540ea70becd7adac7d50f4a7c0.pem`} />
 
-# 撤销运维权限
-> revokeOperator 0x1234...运维账户...
+            <H3>委员新增、撤销与查询</H3>
 
-# 查询运维账户列表
-> listOperators`} />
+            <H4>添加账户1为委员</H4>
+            <CodeBlock language="bash" code={`[group:1]> grantCommitteeMember 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a
+{
+    "code":0,
+    "msg":"success"
+}
+[group:1]> listCommitteeMembers
+---------------------------------------------------------------------------------------------
+|                   address                   |                 enable_num                  |
+| 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a  |                      1                      |
+---------------------------------------------------------------------------------------------`} />
 
-          <H4>合约权限管理命令</H4>
-          <CodeBlock language="bash" code={`# 冻结合约（合约所有者或运维执行）
-> freezeContract 0x5678...合约地址...
+            <H4>使用账户1添加账户2为委员</H4>
+            <P>增加委员需要链治理委员会投票，有效票大于阈值才可生效。此处由于只有账号1是委员，所以账号1投票即可生效。</P>
+            <CodeBlock language="bash" code={`[group:1]> grantCommitteeMember 0x85961172229aec21694d742a5bd577bedffcfec3
+{
+    "code":0,
+    "msg":"success"
+}
+[group:1]> listCommitteeMembers
+---------------------------------------------------------------------------------------------
+|                   address                   |                 enable_num                  |
+| 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a  |                      1                      |
+| 0x85961172229aec21694d742a5bd577bedffcfec3  |                      2                      |
+---------------------------------------------------------------------------------------------`} />
 
-# 解冻合约
-> unfreezeContract 0x5678...合约地址...
+            <H4>验证账号3无权限执行委员操作</H4>
+            <CodeBlock language="bash" code={`[group:1]> setSystemConfigByKey tx_count_limit 100
+{
+    "code":-50000,
+    "msg":"permission denied"
+}`} />
 
-# 查询合约状态（available/frozen/abandoned）
-> getContractStatus 0x5678...合约地址...
+            <H4>撤销账号2的委员权限</H4>
+            <P>此时系统中有两个委员，默认投票生效阈值50%，需要两个委员都投票撤销才满足条件（有效票/总票数=2/2=1{'>'}{'>'}0.5）。</P>
+            <P>账号1投票撤销账号2的委员权限：</P>
+            <CodeBlock language="bash" code={`[group:1]> revokeCommitteeMember 0x85961172229aec21694d742a5bd577bedffcfec3
+{
+    "code":0,
+    "msg":"success"
+}
+[group:1]> listCommitteeMembers
+---------------------------------------------------------------------------------------------
+|                   address                   |                 enable_num                  |
+| 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a  |                      1                      |
+| 0x85961172229aec21694d742a5bd577bedffcfec3  |                      2                      |
+---------------------------------------------------------------------------------------------`} />
+            <P>账号2投票撤销账号2的委员权限：</P>
+            <CodeBlock language="bash" code={`[group:1]> revokeCommitteeMember 0x85961172229aec21694d742a5bd577bedffcfec3
+{
+    "code":0,
+    "msg":"success"
+}
+[group:1]> listCommitteeMembers
+---------------------------------------------------------------------------------------------
+|                   address                   |                 enable_num                  |
+| 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a  |                      1                      |
+---------------------------------------------------------------------------------------------`} />
 
-# 授予账户部署合约权限（在启用部署权限控制后）
-> grantDeployAndCreateManager 0xAAAA...账户地址...
+            <H3>委员权重修改</H3>
+            <P>先添加账户1、账户3为委员，然后更新委员1的票数为2。使用账号1控制台添加账号3为委员：</P>
+            <CodeBlock language="bash" code={`[group:1]> grantCommitteeMember 0x0b6f526d797425540ea70becd7adac7d50f4a7c0
+{
+    "code":0,
+    "msg":"success"
+}
+[group:1]> listCommitteeMembers
+---------------------------------------------------------------------------------------------
+|                   address                   |                 enable_num                  |
+| 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a  |                      1                      |
+| 0x0b6f526d797425540ea70becd7adac7d50f4a7c0  |                      9                      |
+---------------------------------------------------------------------------------------------`} />
+            <P>使用账号1控制台投票更新账号1的票数为2：</P>
+            <CodeBlock language="bash" code={`[group:1]> updateCommitteeMemberWeight 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a 2
+{
+    "code":0,
+    "msg":"success"
+}
+[group:1]> queryCommitteeMemberWeight 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a
+Account: 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a Weight: 1`} />
+            <P>使用账号3控制台投票更新账号1的票数为2：</P>
+            <CodeBlock language="bash" code={`[group:1]> updateCommitteeMemberWeight 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a 2
+{
+    "code":0,
+    "msg":"success"
+}
+[group:1]> queryCommitteeMemberWeight 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a
+Account: 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a Weight: 2`} />
 
-# 撤销部署合约权限
-> revokeDeployAndCreateManager 0xAAAA...账户地址...`} />
+            <H3>委员投票生效阈值修改</H3>
+            <P>账户1和账户3为委员，账号1有2票，账号3有1票，使用账号1添加账号2为委员（2/3{'>'}{'>'}0.5直接生效），然后更新生效阈值为75%。</P>
+            <P>账户1添加账户2为委员：</P>
+            <CodeBlock language="bash" code={`[group:1]> grantCommitteeMember 0x85961172229aec21694d742a5bd577bedffcfec3
+{
+    "code":0,
+    "msg":"success"
+}
+[group:1]> listCommitteeMembers
+---------------------------------------------------------------------------------------------
+|                   address                   |                 enable_num                  |
+| 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a  |                      1                      |
+| 0x0b6f526d797425540ea70becd7adac7d50f4a7c0  |                      9                      |
+| 0x85961172229aec21694d742a5bd577bedffcfec3  |                     12                      |
+---------------------------------------------------------------------------------------------`} />
+            <P>使用账户1控制台投票更新生效阈值为75%：</P>
+            <CodeBlock language="bash" code={`[group:1]> updateThreshold 75
+{
+    "code":0,
+    "msg":"success"
+}
+[group:1]> queryThreshold
+Effective threshold : 50%`} />
+            <P>使用账户2控制台投票更新生效阈值为75%：</P>
+            <CodeBlock language="bash" code={`[group:1]> updateThreshold 75
+{
+    "code":0,
+    "msg":"success"
+}
+[group:1]> queryThreshold
+Effective threshold : 75%`} />
 
-          <H4>权限控制操作表</H4>
-          <UL>
-            <LI><strong className="text-white">部署合约</strong>：默认所有账户可部署；启用 <IC>grantDeployAndCreateManager</IC> 后仅授权账户可部署。</LI>
-            <LI><strong className="text-white">调用合约</strong>：任意账户均可调用已部署的合约，细粒度权限由合约内部逻辑控制。</LI>
-            <LI><strong className="text-white">冻结合约</strong>：合约创建者账户或运维账户可冻结，委员账户可解冻任意合约。</LI>
-            <LI><strong className="text-white">节点管理</strong>：运维账户可执行 <IC>addSealer</IC>/<IC>addObserver</IC>/<IC>removeNode</IC>。</LI>
-            <LI><strong className="text-white">系统配置修改</strong>：运维账户可修改 <IC>tx_count_limit</IC>、<IC>tx_gas_limit</IC> 等系统参数（通过 <IC>setSystemConfigByKey</IC>）。</LI>
-          </UL>
-          <Note type="note">权限控制功能在 DeSpace 2.5.0+ 版本中正式启用。对于现有业务系统的升级，建议先在测试环境充分验证权限模型设计，再在生产环境启用，以避免因权限配置不当导致业务中断。</Note>
+            <H3>运维新增、撤销与查询</H3>
+            <P>委员可以添加运维，运维角色的权限包括部署合约、创建表、冻结解冻所部署的合约、使用CNS服务。基于职责权限分离的设计，委员角色不能兼有运维的权限，生成一个新的账号4 (0x283f5b859e34f7fd2cf136c07579dcc72423b1b2.pem)。</P>
+
+            <H4>添加账号4为运维角色</H4>
+            <CodeBlock language="bash" code={`[group:1]> grantOperator 0x283f5b859e34f7fd2cf136c07579dcc72423b1b2
+{
+    "code":0,
+    "msg":"success"
+}
+[group:1]> listOperators
+---------------------------------------------------------------------------------------------
+|                   address                   |                 enable_num                  |
+| 0x283f5b859e34f7fd2cf136c07579dcc72423b1b2  |                     15                      |
+---------------------------------------------------------------------------------------------`} />
+
+            <H4>使用运维账号部署HelloWorld</H4>
+            <CodeBlock language="bash" code={`[group:1]> deploy HelloWorld
+contract address: 0xac1e28ad93e0b7f9108fa1167a8a06585f663726`} />
+
+            <H4>使用账号1部署HelloWorld失败（委员不兼运维权限）</H4>
+            <CodeBlock language="bash" code={`[group:1]> deploy HelloWorld
+permission denied`} />
+
+            <H4>撤销账号4的运维权限</H4>
+            <CodeBlock language="bash" code={`[group:1]> revokeOperator 0x283f5b859e34f7fd2cf136c07579dcc72423b1b2
+{
+    "code":0,
+    "msg":"success"
+}
+[group:1]> listOperators
+Empty set.`} />
+
+            <h2 className="text-xl font-black text-white tracking-tight mt-12 mb-4 pb-2 border-b border-white/10">基于表的权限控制</h2>
+
+            <Note type="warning">由于系统默认无权限设置记录，任何账户均可使用权限设置功能。推荐使用grantPermissionManager（V2.5.0之前）或grantCommitteeMember（V2.5.0之后）指令设置链管理员账户，防止权限滥用。</Note>
+
+            <H3>权限控制命令</H3>
+            <Table
+              headers={['命令名称', '命令参数', '功能']}
+              rows={[
+                ['grantPermissionManager', 'address', '授权账户的链管理员权限(V2.5.0之前)'],
+                ['revokePermissionManager', 'address', '撤销账户的链管理员权限(V2.5.0之前)'],
+                ['listPermissionManager', '', '查询拥有链管理员权限的账户列表'],
+                ['grantDeployAndCreateManager', 'address', '授权账户的部署合约和创建用户表权限'],
+                ['revokeDeployAndCreateManager', 'address', '撤销账户的部署合约和创建用户表权限'],
+                ['listDeployAndCreateManager', '', '查询拥有部署合约和创建用户表权限的账户列表'],
+                ['grantNodeManager', 'address', '授权账户的节点管理权限'],
+                ['revokeNodeManager', 'address', '撤销账户的节点管理权限'],
+                ['listNodeManager', '', '查询拥有节点管理的账户列表'],
+                ['grantCNSManager', 'address', '授权账户的使用CNS权限'],
+                ['revokeCNSManager', 'address', '撤销账户的使用CNS权限'],
+                ['listCNSManager', '', '查询拥有使用CNS的账户列表'],
+                ['grantSysConfigManager', 'address', '授权账户的修改系统参数权限'],
+                ['revokeSysConfigManager', 'address', '撤销账户的修改系统参数权限'],
+                ['listSysConfigManager', '', '查询拥有修改系统参数的账户列表'],
+                ['grantUserTableManager', 'table_name address', '授权账户对用户表的写权限'],
+                ['revokeUserTableManager', 'table_name address', '撤销账户对用户表的写权限'],
+                ['listUserTableManager', 'table_name', '查询拥有对用户表写权限的账号列表'],
+              ]}
+            />
+
+            <H3>权限控制示例账户</H3>
+            <P>生成三个PKCS12格式的账户文件：</P>
+            <CodeBlock language="bash" code={`# 账户1
+0x2c7f31d22974d5b1b2d6d5c359e81e91ee656252.p12
+# 账户2
+0x7fc8335fec9da5f84e60236029bb4a64a469a021.p12
+# 账户3
+0xd86572ad4c92d4598852e2f34720a865dd4fc3dd.p12`} />
+            <P>分别以三个账户登录控制台：</P>
+            <CodeBlock language="bash" code={`$ ./start.sh 1 -p12 accounts/0x2c7f31d22974d5b1b2d6d5c359e81e91ee656252.p12
+$ ./start.sh 1 -p12 accounts/0x7fc8335fec9da5f84e60236029bb4a64a469a021.p12
+$ ./start.sh 1 -p12 accounts/0xd86572ad4c92d4598852e2f34720a865dd4fc3dd.p12`} />
+
+            <H3>授权账户为链管理员</H3>
+            <CodeBlock language="bash" code={`[group:1]> grantPermissionManager 0x2c7f31d22974d5b1b2d6d5c359e81e91ee656252
+{
+    "code":0,
+    "msg":"success"
+}
+[group:1]> listPermissionManager
+---------------------------------------------------------------------------------------------
+|                   address                   |                 enable_num                  |
+| 0x2c7f31d22974d5b1b2d6d5c359e81e91ee656252  |                      1                      |
+---------------------------------------------------------------------------------------------`} />
+
+            <H3>授权部署合约和创建用户表</H3>
+            <P>通过账户1授权账户2可以部署合约和创建用户表：</P>
+            <CodeBlock language="bash" code={`[group:1]> grantDeployAndCreateManager 0x7fc8335fec9da5f84e60236029bb4a64a469a021
+{
+    "code":0,
+    "msg":"success"
+}
+[group:1]> listDeployAndCreateManager
+---------------------------------------------------------------------------------------------
+|                   address                   |                 enable_num                  |
+| 0x7fc8335fec9da5f84e60236029bb4a64a469a021  |                      2                      |
+---------------------------------------------------------------------------------------------`} />
+            <P>登录账户2的控制台，部署TableTest合约并创建用户表t_test：</P>
+            <CodeBlock language="bash" code={`[group:1]> deploy TableTest.sol
+contract address:0xfe649f510e0ca41f716e7935caee74db993e9de8
+
+[group:1]> call TableTest.sol 0xfe649f510e0ca41f716e7935caee74db993e9de8 create
+transaction hash:0x67ef80cf04d24c488d5f25cc3dc7681035defc82d07ad983fbac820d7db31b5b`} />
+            <P>账户3部署合约失败：</P>
+            <CodeBlock language="bash" code={`[group:1]> deploy TableTest.sol
+{
+    "code":-50000,
+    "msg":"permission denied"
+}`} />
+
+            <H3>授权利用CNS部署合约</H3>
+            <Note type="note">deployByCNS命令同时需要部署合约和使用CNS的权限，callByCNS和queryCNS命令不受权限控制。</Note>
+            <CodeBlock language="bash" code={`[group:1]> grantCNSManager 0x7fc8335fec9da5f84e60236029bb4a64a469a021
+{
+    "code":0,
+    "msg":"success"
+}
+
+# 账户2利用CNS部署合约
+[group:1]> deployByCNS TableTest.sol 1.0
+contract address:0x24f902ff362a01335db94b693edc769ba6226ff7
+
+[group:1]> queryCNS TableTest.sol
+---------------------------------------------------------------------------------------------
+|                   version                   |                   address                   |
+|                     1.0                     | 0x24f902ff362a01335db94b693edc769ba6226ff7  |
+---------------------------------------------------------------------------------------------
+
+# 账户3无权限
+[group:1]> deployByCNS TableTest.sol 2.0
+{
+    "code":-50000,
+    "msg":"permission denied"
+}`} />
+
+            <H3>授权管理节点</H3>
+            <CodeBlock language="bash" code={`[group:1]> grantNodeManager 0x7fc8335fec9da5f84e60236029bb4a64a469a021
+{
+    "code":0,
+    "msg":"success"
+}
+
+# 账户2将节点设置为观察者节点
+[group:1]> addObserver 01cd46feef2bb385bf03d1743c1d1a52753129cf092392acb9e941d1a4e0f499fdf6559dfcd4dbf2b3ca418caa09d953620c2aa3c5bbe93ad5f6b378c678489e
+{
+    "code":0,
+    "msg":"success"
+}
+
+# 账户3无权限管理节点
+[group:1]> addSealer 01cd46feef2bb385bf03d1743c1d1a52753129cf092392acb9e941d1a4e0f499fdf6559dfcd4dbf2b3ca418caa09d953620c2aa3c5bbe93ad5f6b378c678489e
+{
+    "code":-50000,
+    "msg":"permission denied"
+}`} />
+
+            <H3>授权修改系统参数</H3>
+            <CodeBlock language="bash" code={`[group:1]> grantSysConfigManager 0x7fc8335fec9da5f84e60236029bb4a64a469a021
+{
+    "code":0,
+    "msg":"success"
+}
+
+# 账户2修改参数成功
+[group:1]> setSystemConfigByKey tx_count_limit 2000
+{
+    "code":0,
+    "msg":"success"
+}
+
+# 账户3修改失败
+[group:1]> setSystemConfigByKey tx_count_limit 3000
+{
+    "code":-50000,
+    "msg":"permission denied"
+}`} />
+
+            <H3>授权账户写用户表</H3>
+            <CodeBlock language="bash" code={`# 通过账户1授权账户3写用户表t_test
+[group:1]> grantUserTableManager t_test 0xd86572ad4c92d4598852e2f34720a865dd4fc3dd
+{
+    "code":0,
+    "msg":"success"
+}
+[group:1]> listUserTableManager t_test
+---------------------------------------------------------------------------------------------
+|                   address                   |                 enable_num                  |
+| 0xd86572ad4c92d4598852e2f34720a865dd4fc3dd  |                      6                      |
+---------------------------------------------------------------------------------------------
+
+# 账户3插入记录成功
+[group:1]> call TableTest.sol 0xfe649f510e0ca41f716e7935caee74db993e9de8 insert "fruit" 1 "apple"
+transaction hash:0xc4d261026851c3338f1a64ecd4712e5fc2a028c108363181725f07448b986f7e
+
+# 账户2更新失败（无权限）
+[group:1]> call TableTest.sol 0xfe649f510e0ca41f716e7935caee74db993e9de8 update "fruit" 1 "orange"
+{
+    "code":-50000,
+    "msg":"permission denied"
+}
+
+# 撤销账户3的写权限
+[group:1]> revokeUserTableManager t_test 0xd86572ad4c92d4598852e2f34720a865dd4fc3dd
+{
+    "code":0,
+    "msg":"success"
+}
+[group:1]> listUserTableManager t_test
+Empty set.`} />
+            <Note type="note">撤销后没有账户拥有对该表的写权限，因此对该表的写权限恢复初始状态，即所有账户均拥有写权限。</Note>
+
+          </CollapsibleSection>
 
           <div className="mt-16 pt-8 border-t border-white/5 text-slate-600 text-xs space-y-2">
             <p>© Copyright DeSpace 2019. 本技术文档适用于DeSpace 2.x版本。</p>
             <p>Built with Sphinx using a theme provided by Read the Docs.</p>
-            <button onClick={() => navigate('/docs')} className="flex items-center gap-1.5 hover:text-brand-primary transition-colors mt-4">
-              <ArrowLeft size={12} /> 返回开发第一个区块链应用
-            </button>
           </div>
+
         </main>
       </div>
     </div>
