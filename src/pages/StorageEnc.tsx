@@ -126,24 +126,24 @@ export default function StorageEnc() {
           <P>联盟链的数据，只对联盟内部成员可见。落盘加密，保证了运行联盟链的数据，在硬盘上的安全性。一旦硬盘脱离联盟链内网环境，数据将无法被解密。落盘加密对节点存储在硬盘上的内容进行加密，加密内容包括：合约数据以及节点私钥文件。</P>
           <Note type="warning">若节点是SM2版本，Key Manager也必须是SM2版本。节点必须在首次运行前完成落盘加密配置，一旦节点开始运行则无法切换加密状态。</Note>
 
-          <CollapsibleSection id="se-step1" title="第一步. 部署Key Manager">
+          <CollapsibleSection id="se-step1" title="1. 部署Key Manager">
             <P>每个机构部署一个Key Manager。具体部署步骤请参考Key Manager GitHub README或Key Manager Gitee README。</P>
           </CollapsibleSection>
 
-          <CollapsibleSection id="se-step2" title="第二步. 生成节点">
-            <CodeBlock language="bash" code={`curl -#LO https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v2.11.0/build_chain.sh && chmod u+x build_chain.sh
+          <CollapsibleSection id="se-step2" title="2. 生成节点">
+            <CodeBlock language="bash" code={`curl -#LO https://github.com/DeSpace-Chain/releases/download/v2.11.0/build_chain.sh && chmod u+x build_chain.sh
 
 bash build_chain.sh -l 127.0.0.1:4 -p 30300,20200,8545`} />
             <Note type="warning">节点生成后不能直接启动，需完成dataKey配置后再启动。</Note>
           </CollapsibleSection>
 
-          <CollapsibleSection id="se-step3" title="第三步. 启动Key Manager">
+          <CollapsibleSection id="se-step3" title="3. 启动Key Manager">
             <CodeBlock language="bash" code={`./key-manager 8150 123xyz`} />
             <P>成功启动后输出：</P>
             <CodeBlock language="bash" code={`[1546501342949][TRACE][Load]key-manager started,port=8150`} />
           </CollapsibleSection>
 
-          <CollapsibleSection id="se-step4" title="第四步. 配置dataKey">
+          <CollapsibleSection id="se-step4" title="4. 配置dataKey">
             <Note type="note">配置dataKey的节点必须是新生成、从未启动过的节点。</Note>
             <CodeBlock language="bash" code={`cd key-manager/scripts
 bash gen_data_secure_key.sh 127.0.0.1 8150 123456`} />
@@ -165,7 +165,7 @@ key_manager_port=8150
 cipher_data_key=ed157f4588b86d61a2e1745efe71e6ea`} />
           </CollapsibleSection>
 
-          <CollapsibleSection id="se-step5" title="第五步. 加密节点私钥">
+          <CollapsibleSection id="se-step5" title="5. 加密节点私钥">
             <Note type="tip">若使用内置HSM密钥，可跳过此步骤。</Note>
             <CodeBlock language="bash" code={`cd key-manager/scripts
 bash encrypt_node_key.sh 127.0.0.1 8150 ../../nodes/127.0.0.1/node0/conf/node.key ed157f4588b86d61a2e1745efe71e6ea`} />
@@ -175,12 +175,12 @@ bash encrypt_node_key.sh 127.0.0.1 8150 ../../nodes/127.0.0.1/node0/conf/node.ke
             <Note type="warning">需要加密的文件：非SM2版本为conf/node.key；SM2版本为conf/gmnode.key和conf/origin_cert/node.key。未加密将导致节点无法启动。</Note>
           </CollapsibleSection>
 
-          <CollapsibleSection id="se-step6" title="第六步. 节点运行">
+          <CollapsibleSection id="se-step6" title="6. 节点运行">
             <CodeBlock language="bash" code={`cd nodes/127.0.0.1/node0/
 ./start.sh`} />
           </CollapsibleSection>
 
-          <CollapsibleSection id="se-step7" title="第七步. 正确性判断">
+          <CollapsibleSection id="se-step7" title="7. 正确性判断">
             <P>验证方式1：节点正常运行，共识功能正常，持续输出共识打包信息：</P>
             <CodeBlock language="bash" code={`tail -f nodes/127.0.0.1/node0/log/* | grep +++`} />
             <P>验证方式2：Key Manager在每次节点启动时打印一条日志，示例如下：</P>

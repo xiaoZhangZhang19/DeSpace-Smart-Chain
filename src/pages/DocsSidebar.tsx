@@ -49,9 +49,9 @@ const configSubPages = [
     label: '节点配置',
     route: '/docs/config/node-config',
     items: [
-      { id: 'config-ini',     label: '主配置config.ini' },
-      { id: 'config-group',   label: '群组系统配置' },
-      { id: 'config-mutable', label: '账本可变配置' },
+      { id: 'config-ini',     label: '1. 主配置config.ini' },
+      { id: 'config-group',   label: '2. 群组系统配置' },
+      { id: 'config-mutable', label: '3. 账本可变配置' },
     ],
   },
   {
@@ -59,12 +59,12 @@ const configSubPages = [
     label: '组员配置',
     route: '/docs/config/node-management',
     items: [
-      { id: 'nm-ops',        label: '操作命令' },
-      { id: 'nm-cases',      label: '操作案例' },
-      { id: 'nm-join-net',   label: '节点加入网络' },
-      { id: 'nm-leave-net',  label: '节点退出网络' },
-      { id: 'nm-join-group', label: '节点加入群组' },
-      { id: 'nm-leave-group',label: '节点退出群组' },
+      { id: 'nm-ops',        label: '1. 操作命令' },
+      { id: 'nm-cases',      label: '2. 操作案例' },
+      { id: 'nm-join-net',   label: '3. 节点加入网络' },
+      { id: 'nm-leave-net',  label: '4. 节点退出网络' },
+      { id: 'nm-join-group', label: '5. 节点加入群组' },
+      { id: 'nm-leave-group',label: '6. 节点退出群组' },
     ],
   },
   {
@@ -72,10 +72,10 @@ const configSubPages = [
     label: '配置CA黑白名单',
     route: '/docs/config/cert-list',
     items: [
-      { id: 'cl-blacklist', label: '黑名单' },
-      { id: 'cl-whitelist', label: '白名单' },
-      { id: 'cl-public-ca', label: '公共CA场景' },
-      { id: 'cl-examples',  label: '操作举例' },
+      { id: 'cl-blacklist', label: '1. 黑名单' },
+      { id: 'cl-whitelist', label: '2. 白名单' },
+      { id: 'cl-public-ca', label: '3. 公共CA场景' },
+      { id: 'cl-examples',  label: '4. 操作举例' },
     ],
   },
   {
@@ -97,8 +97,8 @@ const configSubPages = [
     label: '账户权限控制',
     route: '/docs/config/permission-control',
     items: [
-      { id: 'pc-role',  label: '基于角色的权限控制' },
-      { id: 'pc-table', label: '基于表的权限控制' },
+      { id: 'pc-role',  label: '1. 基于角色的权限控制' },
+      { id: 'pc-table', label: '2. 基于表的权限控制' },
     ],
   },
   {
@@ -106,8 +106,8 @@ const configSubPages = [
     label: '设置SDK白名单',
     route: '/docs/config/sdk-allowlist',
     items: [
-      { id: 'sa-config', label: '配置方法' },
-      { id: 'sa-usage',  label: '使用说明' },
+      { id: 'sa-config', label: '1. 配置方法' },
+      { id: 'sa-usage',  label: '2. 使用说明' },
     ],
   },
 ];

@@ -117,8 +117,8 @@ export default function KeyConcepts() {
             <h1 className="text-3xl font-black text-white tracking-tight mb-6">关键概念</h1>
           </div>
 
-          <P>DeSpace 基于 FISCO BCOS 构建，是面向企业级应用场景设计的联盟区块链平台。理解区块链的核心概念，有助于开发者更好地设计链上业务逻辑、合理配置网络参数并高效进行运维管理。本文将系统性介绍区块链基础知识以及联盟链的关键特性分析。</P>
-          <Note type="note">本文档中所涉及的技术概念基于 FISCO BCOS 2.x 版本，部分实现细节在 3.x 版本中有所调整，请以实际部署版本的文档为准。</Note>
+          <P>DeSpace 是面向企业级应用场景设计的联盟区块链平台。理解区块链的核心概念，有助于开发者更好地设计链上业务逻辑、合理配置网络参数并高效进行运维管理。本文将系统性介绍区块链基础知识以及联盟链的关键特性分析。</P>
+          <Note type="note">本文档中所涉及的技术概念基于 DeSpace 2.x 版本，部分实现细节在 3.x 版本中有所调整，请以实际部署版本的文档为准。</Note>
 
           <H2 id="blockchain">区块链是什么</H2>
           <P>区块链是一种由多方共同维护、使用密码学保证传输和访问安全、能够实现数据一致存储、防止篡改、防止抵赖的记账技术，也称为分布式账本技术（Distributed Ledger Technology）。</P>

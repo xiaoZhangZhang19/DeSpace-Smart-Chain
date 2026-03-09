@@ -134,7 +134,7 @@ export default function CertList() {
 
           <P>本文档描述CA黑、白名单的实践操作。通过配置CA黑白名单，可以控制节点的连接权限，实现节点间连接的精细化管理。</P>
 
-          <CollapsibleSection id="cl-blacklist" title="黑名单">
+          <CollapsibleSection id="cl-blacklist" title="1. 黑名单">
             <P>通过配置黑名单，能够拒绝与指定的节点连接。</P>
             <P>配置方法，编辑config.ini：</P>
             <CodeBlock language="ini" code={`[certificate_blacklist]
@@ -146,7 +146,7 @@ export default function CertList() {
             <CodeBlock language="bash" code={`$ curl -X POST --data '{"jsonrpc":"2.0","method":"getPeers","params":[1],"id":1}' http://127.0.0.1:8545 |jq`} />
           </CollapsibleSection>
 
-          <CollapsibleSection id="cl-whitelist" title="白名单">
+          <CollapsibleSection id="cl-whitelist" title="2. 白名单">
             <P>通过配置白名单，能够只与指定的节点连接，拒绝与白名单之外的节点连接。不配置表示白名单关闭，可与任意节点建立连接。</P>
             <P>配置方法，编辑config.ini：</P>
             <CodeBlock language="ini" code={`[certificate_whitelist]
@@ -161,7 +161,7 @@ $ cd scripts
 $ bash reload_whitelist.sh`} />
           </CollapsibleSection>
 
-          <CollapsibleSection id="cl-public-ca" title="使用场景：公共CA">
+          <CollapsibleSection id="cl-public-ca" title="3. 使用场景：公共CA">
             <P>所有用CFCA颁发证书搭的链，链的CA都是CFCA，此CA是共用的。必须启用白名单功能。使用公共CA搭的链，会存在两条链共用同一个CA的情况，造成无关的两条链的节点能彼此建立连接。此时需要配置白名单，拒绝与无关的链的节点建立连接。</P>
 
             <H4>搭链操作步骤</H4>
@@ -184,7 +184,7 @@ $ bash reload_whitelist.sh`} />
             </UL>
           </CollapsibleSection>
 
-          <CollapsibleSection id="cl-examples" title="黑白名单操作举例">
+          <CollapsibleSection id="cl-examples" title="4. 黑白名单操作举例">
             <H4>准备</H4>
             <P>搭一个四个节点的链：</P>
             <CodeBlock language="bash" code={`bash build_chain.sh -l 127.0.0.1:4`} />

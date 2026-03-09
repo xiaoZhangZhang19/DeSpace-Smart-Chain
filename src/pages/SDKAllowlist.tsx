@@ -129,10 +129,10 @@ export default function SDKAllowlist() {
           </div>
           <h1 className="text-3xl font-black text-white tracking-tight mb-6">设置SDK白名单</h1>
 
-          <P>为了实现sdk到群组的访问控制，FISCO BCOS v2.6.0引入了群组级的SDK白名单访问控制机制，配置位于group.{'{group_id}'}.ini的[sdk_allowlist]，默认关闭。</P>
-          <Note type="warning">FISCO BCOS v2.6.0默认关闭SDK到群组的白名单访问控制功能，即默认情况下sdk与所有群组均可通信。若要开启sdk与群组间基于白名单的访问控制功能，需要将;public_key.0等配置项前面的分号去掉。</Note>
+          <P>为了实现sdk到群组的访问控制，DeSpace v2.6.0引入了群组级的SDK白名单访问控制机制，配置位于group.{'{group_id}'}.ini的[sdk_allowlist]，默认关闭。</P>
+          <Note type="warning">DeSpace v2.6.0默认关闭SDK到群组的白名单访问控制功能，即默认情况下sdk与所有群组均可通信。若要开启sdk与群组间基于白名单的访问控制功能，需要将;public_key.0等配置项前面的分号去掉。</Note>
 
-          <CollapsibleSection id="sa-config" title="配置方法">
+          <CollapsibleSection id="sa-config" title="1. 配置方法">
             <P>在group.{'{group_id}'}.ini的[sdk_allowlist]中配置允许与该群组进行通信的SDK公钥列表：</P>
             <UL>
               <LI>public_key.0、public_key.1、…、public_key.i：配置允许与该群组进行通信的SDK公钥列表</LI>
@@ -144,7 +144,7 @@ export default function SDKAllowlist() {
 public_key.0=b8acb51b9fe84f88d670646be36f31c52e67544ce56faf3dc8ea4cf1b0ebff0864c6b218fdcd9cf9891ebd414a995847911bd26a770f429300085f3`} />
           </CollapsibleSection>
 
-          <CollapsibleSection id="sa-usage" title="使用说明">
+          <CollapsibleSection id="sa-usage" title="2. 使用说明">
             <UL>
               <LI>当[sdk_allowlist]为空时，所有SDK均可连接到该节点的该群组</LI>
               <LI>当[sdk_allowlist]不为空时，只有白名单中的SDK才可连接到该节点的该群组</LI>

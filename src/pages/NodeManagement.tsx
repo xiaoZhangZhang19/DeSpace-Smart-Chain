@@ -129,14 +129,14 @@ export default function NodeManagement() {
           </div>
           <h1 className="text-3xl font-black text-white tracking-tight mb-6">组员配置</h1>
 
-          <P>FISCO BCOS引入了三种节点类型，可通过控制台相互转换：</P>
+          <P>DeSpace 引入了三种节点类型，可通过控制台相互转换：</P>
           <UL>
             <LI>共识节点（组员）：参与共识的节点，拥有群组的所有数据（搭链时默认都生成共识节点）</LI>
             <LI>观察者节点（组员）：不参与共识，但能实时同步链上数据的节点</LI>
             <LI>游离节点（非组员）：已启动，待等待加入群组的节点，不能获取链上的数据</LI>
           </UL>
 
-          <CollapsibleSection id="nm-ops" title="操作命令">
+          <CollapsibleSection id="nm-ops" title="1. 操作命令">
             <UL>
               <LI>addSealer：根据节点NodeID设置对应节点为共识节点</LI>
               <LI>addObserver：根据节点NodeID设置对应节点为观察节点</LI>
@@ -181,7 +181,7 @@ $ cd ~/fisco/console && bash start.sh
 []`} />
           </CollapsibleSection>
 
-          <CollapsibleSection id="nm-cases" title="操作案例">
+          <CollapsibleSection id="nm-cases" title="2. 操作案例">
             <P>扩容操作分两个阶段：将节点加入网络、将节点加入群组。退网操作分两个阶段：将节点退出群组、将节点退出网络。</P>
             <P>操作方式：</P>
             <UL>
@@ -192,16 +192,16 @@ $ cd ~/fisco/console && bash start.sh
             <P>Group3节点信息：节点1（node0，127.0.0.1:30400，nodeID前缀b231b309）、节点2（node1，127.0.0.1:30401，前缀aab37e73）、节点3（node2，127.0.0.1:30402，前缀d6b01a96）。</P>
           </CollapsibleSection>
 
-          <CollapsibleSection id="nm-join-net" title="A节点加入网络">
+          <CollapsibleSection id="nm-join-net" title="3. 节点加入网络">
             <P>场景描述：节点3原先不在网络中，现在加入网络。</P>
             <P>操作步骤：</P>
             <P>1. 进入nodes同级目录，拉取并执行gen_node_cert.sh生成节点目录：</P>
             <CodeBlock language="bash" code={`# 获取脚本
-$ curl -#LO https://raw.githubusercontent.com/FISCO-BCOS/FISCO-BCOS/master-2.0/tools/gen_node_cert.sh && chmod u+x gen_node_cert.sh
+$ curl -#LO https://github.com/DeSpace-Chain/releases/download/v2.11.0/gen_node_cert.sh && chmod u+x gen_node_cert.sh
 
 # 执行，-c为生成节点所提供的ca路径，-o为将生成的节点目录名
 $ ./gen_node_cert.sh -c nodes/cert/agency -o node2`} />
-            <Note type="note">如因网络问题导致长时间无法下载，请尝试：curl -#LO https://gitee.com/FISCO-BCOS/FISCO-BCOS/raw/master-2.0/tools/gen_node_cert.sh</Note>
+            <Note type="note">如因网络问题导致长时间无法下载，请前往 DeSpace 官方 GitHub Releases 页面手动下载 gen_node_cert.sh。</Note>
             <P>2. 拷贝node2到nodes/127.0.0.1/下，与其他节点目录（node0、node1）同级：</P>
             <CodeBlock language="bash" code={`$ cp -r ./node2/ nodes/127.0.0.1/`} />
             <P>3. 进入nodes/127.0.0.1/，拷贝node0/config.ini、node0/start.sh和node0/stop.sh到node2目录：</P>
@@ -231,7 +231,7 @@ info|2019-02-21 10:30:18.694294| [P2P][Service] heartBeat connected count,size=2
             <Note type="note">若启用了白名单，需确保所有节点的config.ini中的白名单都已配置了所有的节点，并正确地将白名单配置刷新入节点中。</Note>
           </CollapsibleSection>
 
-          <CollapsibleSection id="nm-leave-net" title="A节点退出网络">
+          <CollapsibleSection id="nm-leave-net" title="4. 节点退出网络">
             <P>场景描述：节点3已在网络中，与节点1和节点2通信，现在退出网络。</P>
             <P>操作步骤：</P>
             <P>1. 对于节点3，将自身的P2P节点连接列表内容清空，重启节点3：</P>
@@ -243,7 +243,7 @@ nohup: appending output to 'nohup.out'`} />
             <Note type="warning">节点3需先退出群组再退出网络，退出顺序由用户保证，系统不再作校验。若启用了白名单，需将退出节点从所有节点的config.ini的白名单配置中删除，并正确地将新的白名单配置刷入节点中。</Note>
           </CollapsibleSection>
 
-          <CollapsibleSection id="nm-join-group" title="A节点加入群组">
+          <CollapsibleSection id="nm-join-group" title="5. 节点加入群组">
             <P>场景描述：群组Group3原有节点1和节点2，两节点轮流出块，现在将节点3加入群组。</P>
             <P>操作步骤：</P>
             <UL>
@@ -254,7 +254,7 @@ nohup: appending output to 'nohup.out'`} />
             <Note type="note">节点3的NodeID可使用 cat nodes/127.0.0.1/node2/conf/node.nodeid 获取。节点3需先完成网络准入后，再执行加入群组的操作，系统将校验操作顺序。节点3的群组固定配置文件需与节点1和2的一致。</Note>
           </CollapsibleSection>
 
-          <CollapsibleSection id="nm-leave-group" title="A节点退出群组">
+          <CollapsibleSection id="nm-leave-group" title="6. 节点退出群组">
             <P>场景描述：群组Group3原有节点1、节点2和节点3，三节点轮流出块，现在将节点3退出群组。</P>
             <P>操作步骤：</P>
             <UL>

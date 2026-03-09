@@ -38,6 +38,7 @@ import CertList from './pages/CertList';
 import StorageEnc from './pages/StorageEnc';
 import PermissionControl from './pages/PermissionControl';
 import SDKAllowlist from './pages/SDKAllowlist';
+import StartBuilding from './pages/StartBuilding';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -224,7 +225,7 @@ const UrbanDigitalTwin = () => {
             <Cpu size={14} className="text-brand-accent" />
             <span className="hud-label">TECHNICAL ROUTE</span>
           </div>
-          <div className="text-xl font-mono text-brand-accent tracking-tight">FISCO BCOS</div>
+          <div className="text-xl font-mono text-brand-accent tracking-tight">DeSpace Chain</div>
           <div className="mt-2 text-[9px] text-slate-500 uppercase tracking-widest font-sans">合规联盟链基础设施</div>
         </motion.div>
 
@@ -262,7 +263,7 @@ const Hero = () => {
           >
             <div className="inline-flex items-center gap-3 px-4 py-1 rounded-sm bg-brand-primary/5 border border-brand-primary/20 text-brand-primary text-[10px] font-bold tracking-[0.2em] mb-8 uppercase">
               <Zap size={12} className="animate-pulse" />
-              <span>POWERED BY FISCO BCOS</span>
+              <span>POWERED BY DeSpace CHAIN</span>
             </div>
             <h1 className="text-6xl md:text-8xl font-black leading-[0.9] mb-8 tracking-tighter">
               城市空间 <br />
@@ -272,7 +273,7 @@ const Hero = () => {
               DeSpace Smart Chain (DSC) 是专注“城市空间”垂直场景的产业区块链基础设施，为 <span className="text-white font-mono font-bold">320B m²</span> 存量资产提供高频可信数据底座。
             </p>
             <div className="flex flex-wrap gap-6">
-              <button onClick={() => navigate('/docs')} className="px-10 py-4 rounded-sm bg-brand-primary text-brand-secondary font-black text-xs uppercase tracking-widest flex items-center gap-3 hover:scale-105 transition-all glow-primary">
+              <button onClick={() => navigate('/start-building')} className="px-10 py-4 rounded-sm bg-brand-primary text-brand-secondary font-black text-xs uppercase tracking-widest flex items-center gap-3 hover:scale-105 transition-all glow-primary">
                 START BUILDING <ArrowRight size={16} />
               </button>
             </div>
@@ -1020,6 +1021,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path="/start-building" element={<StartBuilding />} />
       <Route path="/contracts" element={<ContractTemplates />} />
       <Route path="/ide"       element={<ContractIDE />} />
       <Route path="/docs"          element={<Documentation />} />

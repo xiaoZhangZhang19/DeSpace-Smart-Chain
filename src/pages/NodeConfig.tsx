@@ -151,14 +151,14 @@ export default function NodeConfig() {
           </div>
           <h1 className="text-3xl font-black text-white tracking-tight mb-6">节点配置</h1>
 
-          <P>FISCO BCOS支持多账本，每条链包括多个独立账本，账本间数据相互隔离，群组间交易处理相互隔离。每个节点包括：</P>
+          <P>DeSpace 支持多账本，每条链包括多个独立账本，账本间数据相互隔离，群组间交易处理相互隔离。每个节点包括：</P>
           <UL>
             <LI>config.ini：主配置文件，配置RPC、P2P、SSL证书、账本配置文件路径、兼容性等信息</LI>
             <LI>group.group_id.genesis：群组配置文件，群组内所有节点一致，节点启动后不可手动更改。主要包括群组共识算法、存储类型、最大gas限制等</LI>
             <LI>group.group_id.ini：群组可变配置文件，包括交易池大小等，配置后重启节点生效</LI>
           </UL>
 
-          <CollapsibleSection id="config-ini" title="主配置文件config.ini">
+          <CollapsibleSection id="config-ini" title="1. 主配置文件 config.ini">
             <Note type="warning">云主机公网IP均为虚拟IP，若listen_ip/jsonrpc_listen_ip/channel_listen_ip填写外网IP会绑定失败，须填写0.0.0.0；RPC/P2P/Channel监听端口必须位于1024-65535范围内，且不能与机器上其他应用监听端口冲突；为便于开发和体验，listen_ip/channel_listen_ip参考配置是0.0.0.0，出于安全考虑，请根据实际业务网络情况修改为安全的监听地址。</Note>
 
             <H4>配置RPC</H4>
@@ -223,7 +223,7 @@ export default function NodeConfig() {
     group_config_path=conf/`} />
 
             <H4>配置证书信息</H4>
-            <P>基于安全考虑，FISCO BCOS节点间采用SSL加密通信，[network_security]配置SSL连接的证书信息：</P>
+            <P>基于安全考虑，DeSpace 节点间采用SSL加密通信，[network_security]配置SSL连接的证书信息：</P>
             <UL>
               <LI>data_path：证书和私钥文件所在目录</LI>
               <LI>key：节点私钥相对于data_path的路径</LI>
@@ -240,7 +240,7 @@ export default function NodeConfig() {
     ;ca_path=`} />
 
             <H4>配置黑名单列表</H4>
-            <P>基于防作恶考虑，FISCO BCOS允许节点将不受信任的节点加入到黑名单列表，并拒绝与这些黑名单节点建立连接，通过[certificate_blacklist]配置：</P>
+            <P>基于防作恶考虑，DeSpace 允许节点将不受信任的节点加入到黑名单列表，并拒绝与这些黑名单节点建立连接，通过[certificate_blacklist]配置：</P>
             <UL>
               <LI>crl.idx：黑名单节点的Node ID，节点Node ID可通过node.nodeid文件获取；idx是黑名单节点的索引</LI>
             </UL>
@@ -267,7 +267,7 @@ export default function NodeConfig() {
             <Note type="note">v2.11.0新增配置项：log.format（日志格式）、log.enable_rotate_by_hour（按小时滚动）、log.log_name_pattern（日志文件名模式）、log.rotate_name_pattern（滚动后文件名）、log.archive_path（归档目录）、log.compress_archive_file（是否压缩归档）、log.max_archive_files（归档最大文件数，0不限制）、log.max_archive_size（归档最大空间，单位MB，0不限制）、log.min_free_space（最小剩余空间）。</Note>
 
             <H4>统计日志配置</H4>
-            <P>FISCO BCOS在config.ini中提供了enable_statistic选项开启/关闭网络流量和Gas统计功能，默认关闭。</P>
+            <P>DeSpace 在config.ini中提供了enable_statistic选项开启/关闭网络流量和Gas统计功能，默认关闭。</P>
             <CodeBlock language="ini" code={`[log]
     ; enable/disable the statistics function
     enable_statistic=false
@@ -303,7 +303,7 @@ key_manager_port=8150
 cipher_data_key=ed157f4588b86d61a2e1745efe71e6ea`} />
 
             <H4>可选配置：流量控制</H4>
-            <P>FISCO BCOS v2.5.0引入了流量控制功能，配置项位于config.ini的[flow_control]，默认关闭。</P>
+            <P>DeSpace v2.5.0引入了流量控制功能，配置项位于config.ini的[flow_control]，默认关闭。</P>
             <UL>
               <LI>limit_req：SDK请求速率限制，默认关闭（注释状态），去掉注释符号;开启</LI>
               <LI>outgoing_bandwidth_limit：节点出带宽限制，单位Mbit/s，默认关闭</LI>
@@ -316,7 +316,7 @@ cipher_data_key=ed157f4588b86d61a2e1745efe71e6ea`} />
     outgoing_bandwidth_limit=5`} />
           </CollapsibleSection>
 
-          <CollapsibleSection id="config-group" title="群组系统配置说明">
+          <CollapsibleSection id="config-group" title="2. 群组系统配置说明">
             <P>每个群组都有单独的配置文件，按照启动后是否可更改，分为群组系统配置和群组可变配置。群组系统配置一般位于节点的conf目录下.genesis后缀配置文件中，如group1的系统配置一般命名为group.1.genesis。</P>
 
             <Note type="warning">配置系统配置时需注意：必须保证群组内所有节点的该配置一致；系统配置已作为创世块写入系统表，链初始化后不可更改；链初始化后即使更改了genesis配置，新的配置也不会生效；建议使用build_chain工具生成该配置。</Note>
@@ -360,13 +360,13 @@ id=2`} />
     gas_limit=300000000`} />
 
             <H4>EVM配置</H4>
-            <P>FISCO BCOS v2.4.0引入Free Storage Gas衡量模式，通过evm.enable_free_storage配置项控制。</P>
+            <P>DeSpace v2.4.0引入Free Storage Gas衡量模式，通过evm.enable_free_storage配置项控制。</P>
             <CodeBlock language="ini" code={`[evm]
     enable_free_storage=false`} />
             <Note type="note">evm.enable_free_storage v2.4.0开始支持；链初始化时写入创世块，之后手动修改不会生效；默认设置为false。</Note>
           </CollapsibleSection>
 
-          <CollapsibleSection id="config-mutable" title="账本可变配置说明">
+          <CollapsibleSection id="config-mutable" title="3. 账本可变配置说明">
             <P>账本可变配置位于节点conf目录下.ini后缀的文件中，如group1可变配置一般命名为group.1.ini，可变配置主要包括交易池大小、PBFT共识消息转发TTL、PBFT共识打包时间设置等。</P>
 
             <H4>配置storage</H4>
@@ -467,7 +467,7 @@ max_request_missedTxs_waitTime=100`} />
     enable_parallel=true`} />
 
             <H4>可选配置：群组流量控制</H4>
-            <P>FISCO BCOS v2.5.0引入群组级别流量控制，配置位于group.{'{group_id}'}.ini的[flow_control]，默认关闭。</P>
+            <P>DeSpace v2.5.0引入群组级别流量控制，配置位于group.{'{group_id}'}.ini的[flow_control]，默认关闭。</P>
             <CodeBlock language="ini" code={`[flow_control]
     ; restrict QPS of the group
     limit_req=1000

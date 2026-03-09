@@ -151,7 +151,7 @@ export default function PermissionControl() {
           </div>
           <h1 className="text-3xl font-black text-white tracking-tight mb-6">账户权限控制</h1>
 
-          <CollapsibleSection id="pc-role" title="基于角色的权限控制">
+          <CollapsibleSection id="pc-role" title="1. 基于角色的权限控制">
             <P>本节描述角色权限控制的操作，2.5.0版本开始提供基于角色的权限控制模型，原来的链管理员相当于当前的治理委员会委员角色，拥有链治理相关的操作权限。用户不需要关注底层系统表对应的权限，只需关注角色的权限即可。</P>
 
             <H3>权限与角色</H3>
@@ -184,7 +184,7 @@ export default function PermissionControl() {
             />
 
             <H3>环境配置</H3>
-            <P>配置并启动FISCO BCOS 2.0区块链节点和控制台，请参考安装文档。</P>
+            <P>配置并启动 DeSpace 2.0 区块链节点和控制台，请参考安装文档。</P>
 
             <H3>权限控制示例账户</H3>
             <P>控制台提供账户生成脚本get_account.sh，生成的账户文件在accounts目录下，控制台可以指定账户启动。在控制台根目录下通过get_account.sh脚本生成三个PEM格式的账户文件如下：</P>
@@ -358,7 +358,7 @@ permission denied`} />
 Empty set.`} />
           </CollapsibleSection>
 
-          <CollapsibleSection id="pc-table" title="基于表的权限控制">
+          <CollapsibleSection id="pc-table" title="2. 基于表的权限控制">
             <Note type="warning">由于系统默认无权限设置记录，任何账户均可使用权限设置功能。推荐使用grantPermissionManager（V2.5.0之前）或grantCommitteeMember（V2.5.0之后）指令设置链管理员账户，防止权限滥用。</Note>
 
             <H3>操作内容</H3>
@@ -372,7 +372,7 @@ Empty set.`} />
             </UL>
 
             <H3>环境配置</H3>
-            <P>配置并启动FISCO BCOS 2.0区块链节点和控制台，请参考安装文档。</P>
+            <P>配置并启动 DeSpace 2.0 区块链节点和控制台，请参考安装文档。</P>
 
             <H3>权限控制工具</H3>
             <Table
