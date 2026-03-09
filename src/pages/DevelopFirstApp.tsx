@@ -578,9 +578,9 @@ export default function Documentation() {
                 <span>开发第一个区块链应用</span>
                 <ChevronDown size={12} className={`transition-transform duration-200 ${docsExpanded ? 'rotate-0' : '-rotate-90'}`} />
               </button>
-              {docsExpanded && (
+              <div style={{ maxHeight: docsExpanded ? '600px' : '0', overflow: 'hidden', transition: 'max-height 0.3s ease' }}>
                 <ul className="mt-1 space-y-0.5">
-                  {navItems.map((item) => (
+                  {navItems.filter(item => item.id !== 'intro').map((item) => (
                     <li key={item.id}>
                       <button onClick={() => scrollTo(item.id)} className={`w-full text-left px-3 py-1.5 rounded-sm text-xs transition-all ${activeId === item.id ? 'bg-brand-primary/10 text-brand-primary font-bold border-l-2 border-brand-primary' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}>
                         {item.label}
@@ -588,7 +588,7 @@ export default function Documentation() {
                     </li>
                   ))}
                 </ul>
-              )}
+              </div>
             </div>
 
             {/* Section 2: Java SDK Docs */}
