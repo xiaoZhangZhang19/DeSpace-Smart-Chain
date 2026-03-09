@@ -32,6 +32,12 @@ import Documentation from './pages/DevelopFirstApp';
 import JavaSDKDocs from './pages/JavaSDKDocs';
 import KeyConcepts from './pages/KeyConcepts';
 import BlockchainDevConfig from './pages/BlockchainDevConfig';
+import NodeConfig from './pages/NodeConfig';
+import NodeManagement from './pages/NodeManagement';
+import CertList from './pages/CertList';
+import StorageEnc from './pages/StorageEnc';
+import PermissionControl from './pages/PermissionControl';
+import SDKAllowlist from './pages/SDKAllowlist';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -1020,6 +1026,12 @@ export default function App() {
       <Route path="/docs/java-sdk" element={<JavaSDKDocs />} />
       <Route path="/docs/key-concepts"     element={<KeyConcepts />} />
       <Route path="/docs/blockchain-config" element={<BlockchainDevConfig />} />
+        <Route path="/docs/config/node-config" element={<NodeConfig />} />
+        <Route path="/docs/config/node-management" element={<NodeManagement />} />
+        <Route path="/docs/config/cert-list" element={<CertList />} />
+        <Route path="/docs/config/storage-enc" element={<StorageEnc />} />
+        <Route path="/docs/config/permission-control" element={<PermissionControl />} />
+        <Route path="/docs/config/sdk-allowlist" element={<SDKAllowlist />} />
     </Routes>
   );
 }

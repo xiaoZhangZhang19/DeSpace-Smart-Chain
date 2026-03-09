@@ -43,27 +43,87 @@ export const keyConceptsNavItems = [
   { id: 'consortium-governance', label: '　治理与监管' },
 ];
 
-export const configNavItems = [
-  { id: 'node-config',        label: '节点配置' },
-  { id: 'config-ini',         label: '　主配置config.ini' },
-  { id: 'config-group',       label: '　群组系统配置' },
-  { id: 'config-mutable',     label: '　账本可变配置' },
-  { id: 'node-management',    label: '组员配置' },
-  { id: 'cert-list',          label: '配置CA黑白名单' },
-  { id: 'storage-enc',        label: '存储加密' },
-  { id: 'permission-control', label: '账户权限控制' },
-  { id: 'sdk-allowlist',      label: '设置SDK白名单' },
+const configSubPages = [
+  {
+    key: 'node-config',
+    label: '节点配置',
+    route: '/docs/config/node-config',
+    items: [
+      { id: 'config-ini',     label: '主配置config.ini' },
+      { id: 'config-group',   label: '群组系统配置' },
+      { id: 'config-mutable', label: '账本可变配置' },
+    ],
+  },
+  {
+    key: 'node-management',
+    label: '组员配置',
+    route: '/docs/config/node-management',
+    items: [
+      { id: 'nm-ops',        label: '操作命令' },
+      { id: 'nm-cases',      label: '操作案例' },
+      { id: 'nm-join-net',   label: '节点加入网络' },
+      { id: 'nm-leave-net',  label: '节点退出网络' },
+      { id: 'nm-join-group', label: '节点加入群组' },
+      { id: 'nm-leave-group',label: '节点退出群组' },
+    ],
+  },
+  {
+    key: 'cert-list',
+    label: '配置CA黑白名单',
+    route: '/docs/config/cert-list',
+    items: [
+      { id: 'cl-blacklist', label: '黑名单' },
+      { id: 'cl-whitelist', label: '白名单' },
+      { id: 'cl-public-ca', label: '公共CA场景' },
+      { id: 'cl-examples',  label: '操作举例' },
+    ],
+  },
+  {
+    key: 'storage-enc',
+    label: '存储加密',
+    route: '/docs/config/storage-enc',
+    items: [
+      { id: 'se-step1', label: '1. 部署Key Manager' },
+      { id: 'se-step2', label: '2. 生成节点' },
+      { id: 'se-step3', label: '3. 启动Key Manager' },
+      { id: 'se-step4', label: '4. 配置dataKey' },
+      { id: 'se-step5', label: '5. 加密节点私钥' },
+      { id: 'se-step6', label: '6. 节点运行' },
+      { id: 'se-step7', label: '7. 正确性判断' },
+    ],
+  },
+  {
+    key: 'permission-control',
+    label: '账户权限控制',
+    route: '/docs/config/permission-control',
+    items: [
+      { id: 'pc-role',  label: '基于角色的权限控制' },
+      { id: 'pc-table', label: '基于表的权限控制' },
+    ],
+  },
+  {
+    key: 'sdk-allowlist',
+    label: '设置SDK白名单',
+    route: '/docs/config/sdk-allowlist',
+    items: [
+      { id: 'sa-config', label: '配置方法' },
+      { id: 'sa-usage',  label: '使用说明' },
+    ],
+  },
 ];
 
-const sections = [
-  { key: 'develop',      label: '开发第一个区块链应用', route: '/docs',                   items: developNavItems },
-  { key: 'java-sdk',     label: 'Java SDK Docs',         route: '/docs/java-sdk',          items: javaNavItems },
-  { key: 'key-concepts', label: '关键概念',               route: '/docs/key-concepts',      items: keyConceptsNavItems },
-  { key: 'config',       label: '配置管理',               route: '/docs/blockchain-config', items: configNavItems },
+const CONFIG_PAGE_KEYS = configSubPages.map(p => p.key);
+
+type ActivePage = 'develop' | 'java-sdk' | 'key-concepts' | 'node-config' | 'node-management' | 'cert-list' | 'storage-enc' | 'permission-control' | 'sdk-allowlist';
+
+const mainSections = [
+  { key: 'develop',      label: '开发第一个区块链应用', route: '/docs',              items: developNavItems },
+  { key: 'java-sdk',     label: 'Java SDK Docs',        route: '/docs/java-sdk',     items: javaNavItems },
+  { key: 'key-concepts', label: '关键概念',              route: '/docs/key-concepts', items: keyConceptsNavItems },
 ];
 
 interface Props {
-  activePage: 'develop' | 'java-sdk' | 'key-concepts' | 'config';
+  activePage: ActivePage;
   activeId: string;
   scrollTo: (id: string) => void;
   sidebarOpen: boolean;
@@ -71,15 +131,28 @@ interface Props {
 
 export default function DocsSidebar({ activePage, activeId, scrollTo, sidebarOpen }: Props) {
   const navigate = useNavigate();
-  const [expanded, setExpanded] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(sections.map(s => [s.key, s.key === activePage]))
-  );
+  const isConfigPage = (CONFIG_PAGE_KEYS as string[]).includes(activePage);
+
+  const [expanded, setExpanded] = useState<Record<string, boolean>>(() => {
+    const init: Record<string, boolean> = {};
+    mainSections.forEach(s => { init[s.key] = s.key === activePage; });
+    init['config'] = isConfigPage;
+    return init;
+  });
 
   const toggle = (key: string, route: string) => {
     setExpanded(prev => {
       const nowExpanded = !prev[key];
-      if (nowExpanded && key !== activePage) navigate(route);
+      if (nowExpanded && key !== activePage && !(CONFIG_PAGE_KEYS as string[]).includes(key)) navigate(route);
       return { ...prev, [key]: nowExpanded };
+    });
+  };
+
+  const toggleConfig = () => {
+    setExpanded(prev => {
+      const nowExpanded = !prev['config'];
+      if (nowExpanded && !isConfigPage) navigate(configSubPages[0].route);
+      return { ...prev, config: nowExpanded };
     });
   };
 
@@ -87,7 +160,9 @@ export default function DocsSidebar({ activePage, activeId, scrollTo, sidebarOpe
     <aside className={`fixed md:sticky top-14 z-40 h-[calc(100vh-3.5rem)] w-60 bg-[#020c18] border-r border-white/5 overflow-y-auto transition-transform duration-300 shrink-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
       <nav className="p-4">
         <p className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-3">目录</p>
-        {sections.map(section => {
+
+        {/* Main sections: develop, java-sdk, key-concepts */}
+        {mainSections.map(section => {
           const isActive = activePage === section.key;
           const isExpanded = expanded[section.key];
           return (
@@ -127,6 +202,64 @@ export default function DocsSidebar({ activePage, activeId, scrollTo, sidebarOpe
             </div>
           );
         })}
+
+        {/* Config section with sub-pages */}
+        <div className="mb-2">
+          <button
+            onClick={toggleConfig}
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-sm text-xs font-bold transition-all ${
+              isConfigPage
+                ? 'text-white bg-brand-primary/10 border-l-2 border-brand-primary hover:bg-brand-primary/20'
+                : 'text-slate-400 hover:text-white hover:bg-white/5 border-l-2 border-transparent hover:border-slate-500'
+            }`}
+          >
+            <span>配置管理</span>
+            <ChevronDown size={12} className={`transition-transform duration-200 ${expanded['config'] ? 'rotate-0' : '-rotate-90'}`} />
+          </button>
+          <div
+            className="overflow-hidden transition-all duration-300 ease-in-out"
+            style={{ maxHeight: expanded['config'] ? '1200px' : '0' }}
+          >
+            <ul className="mt-1 space-y-0.5">
+              {configSubPages.map(subPage => {
+                const isSubActive = activePage === subPage.key;
+                return (
+                  <li key={subPage.key}>
+                    <button
+                      onClick={() => navigate(subPage.route)}
+                      className={`w-full text-left px-3 py-1.5 rounded-sm text-xs transition-all font-medium ${
+                        isSubActive
+                          ? 'bg-brand-primary/10 text-brand-primary font-bold border-l-2 border-brand-primary'
+                          : 'text-slate-500 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      {subPage.label}
+                    </button>
+                    {/* Show scroll items only for the active sub-page */}
+                    {isSubActive && subPage.items.length > 0 && (
+                      <ul className="ml-3 mt-0.5 space-y-0.5">
+                        {subPage.items.map(item => (
+                          <li key={item.id}>
+                            <button
+                              onClick={() => scrollTo(item.id)}
+                              className={`w-full text-left px-3 py-1 rounded-sm text-xs transition-all ${
+                                activeId === item.id
+                                  ? 'text-brand-primary font-bold'
+                                  : 'text-slate-600 hover:text-white hover:bg-white/5'
+                              }`}
+                            >
+                              {item.label}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>
       </nav>
     </aside>
   );
