@@ -48,10 +48,11 @@ export const configNavItems = [
   { id: 'config-ini',         label: '　主配置config.ini' },
   { id: 'config-group',       label: '　群组系统配置' },
   { id: 'config-mutable',     label: '　账本可变配置' },
-  { id: 'node-management',    label: '组员节点管理' },
-  { id: 'cert-list',          label: 'CA黑白名单配置' },
+  { id: 'node-management',    label: '组员配置' },
+  { id: 'cert-list',          label: '配置CA黑白名单' },
   { id: 'storage-enc',        label: '存储加密' },
   { id: 'permission-control', label: '账户权限控制' },
+  { id: 'sdk-allowlist',      label: '设置SDK白名单' },
 ];
 
 const sections = [
