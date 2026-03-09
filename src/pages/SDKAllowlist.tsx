@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Database, Menu, X, Copy, Check, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Database, Menu, X, Copy, Check, ChevronRight, ChevronDown } from 'lucide-react';
 import DocsSidebar from './DocsSidebar';
 
 const CodeBlock = ({ code, language = 'bash' }: { code: string; language?: string }) => {
@@ -52,6 +53,36 @@ const LI = ({ children }: { children: React.ReactNode }) => (
   <li className="flex items-start gap-2"><ChevronRight size={12} className="text-brand-primary mt-1 shrink-0" /><span>{children}</span></li>
 );
 
+const CollapsibleSection = ({ id, title, defaultOpen = true, children }: { id: string; title: string; defaultOpen?: boolean; children: React.ReactNode }) => {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div>
+      <button
+        id={id}
+        onClick={() => setOpen(o => !o)}
+        className="scroll-mt-20 w-full flex items-center justify-between text-lg font-black text-white tracking-tight mt-10 mb-4 pb-2 border-b border-white/10 hover:text-brand-primary transition-colors"
+      >
+        <span>{title}</span>
+        <ChevronDown size={16} className={`transition-transform duration-200 text-brand-primary ${open ? 'rotate-0' : '-rotate-90'}`} />
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="content"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            style={{ overflow: 'hidden' }}
+          >
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 export default function SDKAllowlist() {
   const navigate = useNavigate();
   const [activeId, setActiveId] = useState('sa-config');
@@ -101,24 +132,26 @@ export default function SDKAllowlist() {
           <P>为了实现sdk到群组的访问控制，FISCO BCOS v2.6.0引入了群组级的SDK白名单访问控制机制，配置位于group.{'{group_id}'}.ini的[sdk_allowlist]，默认关闭。</P>
           <Note type="warning">FISCO BCOS v2.6.0默认关闭SDK到群组的白名单访问控制功能，即默认情况下sdk与所有群组均可通信。若要开启sdk与群组间基于白名单的访问控制功能，需要将;public_key.0等配置项前面的分号去掉。</Note>
 
-          <H3 id="sa-config">配置方法</H3>
-          <P>在group.{'{group_id}'}.ini的[sdk_allowlist]中配置允许与该群组进行通信的SDK公钥列表：</P>
-          <UL>
-            <LI>public_key.0、public_key.1、…、public_key.i：配置允许与该群组进行通信的SDK公钥列表</LI>
-          </UL>
-          <CodeBlock language="ini" code={`[sdk_allowlist]
+          <CollapsibleSection id="sa-config" title="配置方法">
+            <P>在group.{'{group_id}'}.ini的[sdk_allowlist]中配置允许与该群组进行通信的SDK公钥列表：</P>
+            <UL>
+              <LI>public_key.0、public_key.1、…、public_key.i：配置允许与该群组进行通信的SDK公钥列表</LI>
+            </UL>
+            <CodeBlock language="ini" code={`[sdk_allowlist]
 ; When sdk_allowlist is empty, all SDKs can connect to this node
 ; when sdk_allowlist is not empty, only the SDK in the allowlist can connect to this node
 ; public_key.0 should be nodeid, nodeid's length is 128
 public_key.0=b8acb51b9fe84f88d670646be36f31c52e67544ce56faf3dc8ea4cf1b0ebff0864c6b218fdcd9cf9891ebd414a995847911bd26a770f429300085f3`} />
+          </CollapsibleSection>
 
-          <H3 id="sa-usage">使用说明</H3>
-          <UL>
-            <LI>当[sdk_allowlist]为空时，所有SDK均可连接到该节点的该群组</LI>
-            <LI>当[sdk_allowlist]不为空时，只有白名单中的SDK才可连接到该节点的该群组</LI>
-            <LI>需要将SDK的公钥（NodeID格式，长度128字符）配置到白名单中</LI>
-            <LI>此配置支持热加载，修改配置后无需重启节点即可生效</LI>
-          </UL>
+          <CollapsibleSection id="sa-usage" title="使用说明">
+            <UL>
+              <LI>当[sdk_allowlist]为空时，所有SDK均可连接到该节点的该群组</LI>
+              <LI>当[sdk_allowlist]不为空时，只有白名单中的SDK才可连接到该节点的该群组</LI>
+              <LI>需要将SDK的公钥（NodeID格式，长度128字符）配置到白名单中</LI>
+              <LI>此配置支持热加载，修改配置后无需重启节点即可生效</LI>
+            </UL>
+          </CollapsibleSection>
 
           <div className="mt-16 pt-8 border-t border-white/5 text-slate-600 text-xs space-y-2">
             <p>© Copyright DeSpace 2019. 本技术文档适用于DeSpace 2.x版本。</p>

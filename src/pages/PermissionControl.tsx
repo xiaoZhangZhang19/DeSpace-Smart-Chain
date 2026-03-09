@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Database, Menu, X, Copy, Check, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Database, Menu, X, Copy, Check, ChevronRight, ChevronDown } from 'lucide-react';
 import DocsSidebar from './DocsSidebar';
 
 const CodeBlock = ({ code, language = 'bash' }: { code: string; language?: string }) => {
@@ -74,6 +75,36 @@ const Table = ({ headers, rows }: { headers: string[]; rows: string[][] }) => (
   </div>
 );
 
+const CollapsibleSection = ({ id, title, defaultOpen = true, children }: { id: string; title: string; defaultOpen?: boolean; children: React.ReactNode }) => {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div>
+      <button
+        id={id}
+        onClick={() => setOpen(o => !o)}
+        className="scroll-mt-20 w-full flex items-center justify-between text-lg font-black text-white tracking-tight mt-10 mb-4 pb-2 border-b border-white/10 hover:text-brand-primary transition-colors"
+      >
+        <span>{title}</span>
+        <ChevronDown size={16} className={`transition-transform duration-200 text-brand-primary ${open ? 'rotate-0' : '-rotate-90'}`} />
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="content"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            style={{ overflow: 'hidden' }}
+          >
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 export default function PermissionControl() {
   const navigate = useNavigate();
   const [activeId, setActiveId] = useState('pc-role');
@@ -120,62 +151,61 @@ export default function PermissionControl() {
           </div>
           <h1 className="text-3xl font-black text-white tracking-tight mb-6">账户权限控制</h1>
 
-          <h2 id="pc-role" className="text-xl font-black text-white tracking-tight mt-10 mb-4 pb-2 border-b border-white/10 scroll-mt-20">基于角色的权限控制</h2>
+          <CollapsibleSection id="pc-role" title="基于角色的权限控制">
+            <P>本节描述角色权限控制的操作，2.5.0版本开始提供基于角色的权限控制模型，原来的链管理员相当于当前的治理委员会委员角色，拥有链治理相关的操作权限。用户不需要关注底层系统表对应的权限，只需关注角色的权限即可。</P>
 
-          <P>本节描述角色权限控制的操作，2.5.0版本开始提供基于角色的权限控制模型，原来的链管理员相当于当前的治理委员会委员角色，拥有链治理相关的操作权限。用户不需要关注底层系统表对应的权限，只需关注角色的权限即可。</P>
+            <H3>权限与角色</H3>
+            <UL>
+              <LI>链治理委员会委员（简称委员）</LI>
+              <LI>权限使用白名单机制，默认不检查，当存在至少一个角色的账号时，角色对应的权限检查生效</LI>
+              <LI>委员可以冻结解冻任意合约，同时合约的部署账号也可以冻结解冻合约</LI>
+              <LI>委员可以冻结解冻账号，被冻结的账号无法发送交易</LI>
+            </UL>
 
-          <H3>权限与角色</H3>
-          <UL>
-            <LI>链治理委员会委员（简称委员）</LI>
-            <LI>权限使用白名单机制，默认不检查，当存在至少一个角色的账号时，角色对应的权限检查生效</LI>
-            <LI>委员可以冻结解冻任意合约，同时合约的部署账号也可以冻结解冻合约</LI>
-            <LI>委员可以冻结解冻账号，被冻结的账号无法发送交易</LI>
-          </UL>
+            <H3>权限操作表格</H3>
+            <Table
+              headers={['权限操作', '修改方式']}
+              rows={[
+                ['增删委员', '委员投票'],
+                ['修改委员权重', '委员投票'],
+                ['修改生效投票阈值（投票委员权重和大于该值）', '委员投票'],
+                ['增删节点（观察/共识）', '委员账号'],
+                ['修改链配置项', '委员账号'],
+                ['冻结解冻合约', '委员账号'],
+                ['冻结解冻账号', '委员账号'],
+                ['添加撤销运维', '委员账号'],
+                ['用户表的写权限', '委员账号'],
+                ['部署合约', '运维账号'],
+                ['创建表', '运维账号'],
+                ['合约版本管理', '运维账号'],
+                ['冻结解冻本账号部署的合约', '运维账号'],
+                ['调用合约写接口', '有管理合约生命周期权限的账号'],
+              ]}
+            />
 
-          <H3>权限操作表格</H3>
-          <Table
-            headers={['权限操作', '修改方式']}
-            rows={[
-              ['增删委员', '委员投票'],
-              ['修改委员权重', '委员投票'],
-              ['修改生效投票阈值（投票委员权重和大于该值）', '委员投票'],
-              ['增删节点（观察/共识）', '委员账号'],
-              ['修改链配置项', '委员账号'],
-              ['冻结解冻合约', '委员账号'],
-              ['冻结解冻账号', '委员账号'],
-              ['添加撤销运维', '委员账号'],
-              ['用户表的写权限', '委员账号'],
-              ['部署合约', '运维账号'],
-              ['创建表', '运维账号'],
-              ['合约版本管理', '运维账号'],
-              ['冻结解冻本账号部署的合约', '运维账号'],
-              ['调用合约写接口', '有管理合约生命周期权限的账号'],
-            ]}
-          />
+            <H3>环境配置</H3>
+            <P>配置并启动FISCO BCOS 2.0区块链节点和控制台，请参考安装文档。</P>
 
-          <H3>环境配置</H3>
-          <P>配置并启动FISCO BCOS 2.0区块链节点和控制台，请参考安装文档。</P>
-
-          <H3>权限控制示例账户</H3>
-          <P>控制台提供账户生成脚本get_account.sh，生成的账户文件在accounts目录下，控制台可以指定账户启动。在控制台根目录下通过get_account.sh脚本生成三个PEM格式的账户文件如下：</P>
-          <CodeBlock language="bash" code={`# 账户1
+            <H3>权限控制示例账户</H3>
+            <P>控制台提供账户生成脚本get_account.sh，生成的账户文件在accounts目录下，控制台可以指定账户启动。在控制台根目录下通过get_account.sh脚本生成三个PEM格式的账户文件如下：</P>
+            <CodeBlock language="bash" code={`# 账户1
 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a.pem
 # 账户2
 0x85961172229aec21694d742a5bd577bedffcfec3.pem
 # 账户3
 0x0b6f526d797425540ea70becd7adac7d50f4a7c0.pem`} />
-          <P>打开三个连接Linux的终端，分别以三个账户登录控制台：</P>
-          <CodeBlock language="bash" code={`# 指定账户1登录
+            <P>打开三个连接Linux的终端，分别以三个账户登录控制台：</P>
+            <CodeBlock language="bash" code={`# 指定账户1登录
 ./start.sh 1 -pem accounts/0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a.pem
 # 指定账户2登录
 ./start.sh 1 -pem accounts/0x85961172229aec21694d742a5bd577bedffcfec3.pem
 # 指定账户3登录
 ./start.sh 1 -pem accounts/0x0b6f526d797425540ea70becd7adac7d50f4a7c0.pem`} />
 
-          <H3>委员新增、撤销与查询</H3>
+            <H3>委员新增、撤销与查询</H3>
 
-          <H4>添加账户1为委员</H4>
-          <CodeBlock language="bash" code={`[group:1]> grantCommitteeMember 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a
+            <H4>添加账户1为委员</H4>
+            <CodeBlock language="bash" code={`[group:1]> grantCommitteeMember 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a
 {
     "code":0,
     "msg":"success"
@@ -186,9 +216,9 @@ export default function PermissionControl() {
 | 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a  |                      1                      |
 ---------------------------------------------------------------------------------------------`} />
 
-          <H4>使用账户1添加账户2为委员</H4>
-          <P>增加委员需要链治理委员会投票，有效票大于阈值才可生效。此处由于只有账号1是委员，所以账号1投票即可生效。</P>
-          <CodeBlock language="bash" code={`[group:1]> grantCommitteeMember 0x85961172229aec21694d742a5bd577bedffcfec3
+            <H4>使用账户1添加账户2为委员</H4>
+            <P>增加委员需要链治理委员会投票，有效票大于阈值才可生效。此处由于只有账号1是委员，所以账号1投票即可生效。</P>
+            <CodeBlock language="bash" code={`[group:1]> grantCommitteeMember 0x85961172229aec21694d742a5bd577bedffcfec3
 {
     "code":0,
     "msg":"success"
@@ -200,17 +230,17 @@ export default function PermissionControl() {
 | 0x85961172229aec21694d742a5bd577bedffcfec3  |                      2                      |
 ---------------------------------------------------------------------------------------------`} />
 
-          <H4>验证账号3无权限执行委员操作</H4>
-          <CodeBlock language="bash" code={`[group:1]> setSystemConfigByKey tx_count_limit 100
+            <H4>验证账号3无权限执行委员操作</H4>
+            <CodeBlock language="bash" code={`[group:1]> setSystemConfigByKey tx_count_limit 100
 {
     "code":-50000,
     "msg":"permission denied"
 }`} />
 
-          <H4>撤销账号2的委员权限</H4>
-          <P>此时系统中有两个委员，默认投票生效阈值50%，需要两个委员都投票撤销才满足条件（有效票/总票数=2/2=1{'>'}{'>'}0.5）。</P>
-          <P>账号1投票撤销账号2的委员权限：</P>
-          <CodeBlock language="bash" code={`[group:1]> revokeCommitteeMember 0x85961172229aec21694d742a5bd577bedffcfec3
+            <H4>撤销账号2的委员权限</H4>
+            <P>此时系统中有两个委员，默认投票生效阈值50%，需要两个委员都投票撤销才满足条件（有效票/总票数=2/2=1{'>'}{'>'}0.5）。</P>
+            <P>账号1投票撤销账号2的委员权限：</P>
+            <CodeBlock language="bash" code={`[group:1]> revokeCommitteeMember 0x85961172229aec21694d742a5bd577bedffcfec3
 {
     "code":0,
     "msg":"success"
@@ -221,8 +251,8 @@ export default function PermissionControl() {
 | 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a  |                      1                      |
 | 0x85961172229aec21694d742a5bd577bedffcfec3  |                      2                      |
 ---------------------------------------------------------------------------------------------`} />
-          <P>账号2投票撤销账号2的委员权限：</P>
-          <CodeBlock language="bash" code={`[group:1]> revokeCommitteeMember 0x85961172229aec21694d742a5bd577bedffcfec3
+            <P>账号2投票撤销账号2的委员权限：</P>
+            <CodeBlock language="bash" code={`[group:1]> revokeCommitteeMember 0x85961172229aec21694d742a5bd577bedffcfec3
 {
     "code":0,
     "msg":"success"
@@ -233,9 +263,9 @@ export default function PermissionControl() {
 | 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a  |                      1                      |
 ---------------------------------------------------------------------------------------------`} />
 
-          <H3>委员权重修改</H3>
-          <P>先添加账户1、账户3为委员，然后更新委员1的票数为2。使用账号1控制台添加账号3为委员：</P>
-          <CodeBlock language="bash" code={`[group:1]> grantCommitteeMember 0x0b6f526d797425540ea70becd7adac7d50f4a7c0
+            <H3>委员权重修改</H3>
+            <P>先添加账户1、账户3为委员，然后更新委员1的票数为2。使用账号1控制台添加账号3为委员：</P>
+            <CodeBlock language="bash" code={`[group:1]> grantCommitteeMember 0x0b6f526d797425540ea70becd7adac7d50f4a7c0
 {
     "code":0,
     "msg":"success"
@@ -246,16 +276,16 @@ export default function PermissionControl() {
 | 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a  |                      1                      |
 | 0x0b6f526d797425540ea70becd7adac7d50f4a7c0  |                      9                      |
 ---------------------------------------------------------------------------------------------`} />
-          <P>使用账号1控制台投票更新账号1的票数为2：</P>
-          <CodeBlock language="bash" code={`[group:1]> updateCommitteeMemberWeight 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a 2
+            <P>使用账号1控制台投票更新账号1的票数为2：</P>
+            <CodeBlock language="bash" code={`[group:1]> updateCommitteeMemberWeight 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a 2
 {
     "code":0,
     "msg":"success"
 }
 [group:1]> queryCommitteeMemberWeight 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a
 Account: 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a Weight: 1`} />
-          <P>使用账号3控制台投票更新账号1的票数为2：</P>
-          <CodeBlock language="bash" code={`[group:1]> updateCommitteeMemberWeight 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a 2
+            <P>使用账号3控制台投票更新账号1的票数为2：</P>
+            <CodeBlock language="bash" code={`[group:1]> updateCommitteeMemberWeight 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a 2
 {
     "code":0,
     "msg":"success"
@@ -263,10 +293,10 @@ Account: 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a Weight: 1`} />
 [group:1]> queryCommitteeMemberWeight 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a
 Account: 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a Weight: 2`} />
 
-          <H3>委员投票生效阈值修改</H3>
-          <P>账户1和账户3为委员，账号1有2票，账号3有1票，使用账号1添加账号2为委员（2/3{'>'}{'>'}0.5直接生效），然后更新生效阈值为75%。</P>
-          <P>账户1添加账户2为委员：</P>
-          <CodeBlock language="bash" code={`[group:1]> grantCommitteeMember 0x85961172229aec21694d742a5bd577bedffcfec3
+            <H3>委员投票生效阈值修改</H3>
+            <P>账户1和账户3为委员，账号1有2票，账号3有1票，使用账号1添加账号2为委员（2/3{'>'}{'>'}0.5直接生效），然后更新生效阈值为75%。</P>
+            <P>账户1添加账户2为委员：</P>
+            <CodeBlock language="bash" code={`[group:1]> grantCommitteeMember 0x85961172229aec21694d742a5bd577bedffcfec3
 {
     "code":0,
     "msg":"success"
@@ -278,16 +308,16 @@ Account: 0x61d88abf7ce4a7f8479cff9cc1422bef2dac9b9a Weight: 2`} />
 | 0x0b6f526d797425540ea70becd7adac7d50f4a7c0  |                      9                      |
 | 0x85961172229aec21694d742a5bd577bedffcfec3  |                     12                      |
 ---------------------------------------------------------------------------------------------`} />
-          <P>使用账户1控制台投票更新生效阈值为75%：</P>
-          <CodeBlock language="bash" code={`[group:1]> updateThreshold 75
+            <P>使用账户1控制台投票更新生效阈值为75%：</P>
+            <CodeBlock language="bash" code={`[group:1]> updateThreshold 75
 {
     "code":0,
     "msg":"success"
 }
 [group:1]> queryThreshold
 Effective threshold : 50%`} />
-          <P>使用账户2控制台投票更新生效阈值为75%：</P>
-          <CodeBlock language="bash" code={`[group:1]> updateThreshold 75
+            <P>使用账户2控制台投票更新生效阈值为75%：</P>
+            <CodeBlock language="bash" code={`[group:1]> updateThreshold 75
 {
     "code":0,
     "msg":"success"
@@ -295,11 +325,11 @@ Effective threshold : 50%`} />
 [group:1]> queryThreshold
 Effective threshold : 75%`} />
 
-          <H3>运维新增、撤销与查询</H3>
-          <P>委员可以添加运维，运维角色的权限包括部署合约、创建表、冻结解冻所部署的合约、使用CNS服务。基于职责权限分离的设计，委员角色不能兼有运维的权限，生成一个新的账号4 (0x283f5b859e34f7fd2cf136c07579dcc72423b1b2.pem)。</P>
+            <H3>运维新增、撤销与查询</H3>
+            <P>委员可以添加运维，运维角色的权限包括部署合约、创建表、冻结解冻所部署的合约、使用CNS服务。基于职责权限分离的设计，委员角色不能兼有运维的权限，生成一个新的账号4 (0x283f5b859e34f7fd2cf136c07579dcc72423b1b2.pem)。</P>
 
-          <H4>添加账号4为运维角色</H4>
-          <CodeBlock language="bash" code={`[group:1]> grantOperator 0x283f5b859e34f7fd2cf136c07579dcc72423b1b2
+            <H4>添加账号4为运维角色</H4>
+            <CodeBlock language="bash" code={`[group:1]> grantOperator 0x283f5b859e34f7fd2cf136c07579dcc72423b1b2
 {
     "code":0,
     "msg":"success"
@@ -310,80 +340,80 @@ Effective threshold : 75%`} />
 | 0x283f5b859e34f7fd2cf136c07579dcc72423b1b2  |                     15                      |
 ---------------------------------------------------------------------------------------------`} />
 
-          <H4>使用运维账号部署HelloWorld</H4>
-          <CodeBlock language="bash" code={`[group:1]> deploy HelloWorld
+            <H4>使用运维账号部署HelloWorld</H4>
+            <CodeBlock language="bash" code={`[group:1]> deploy HelloWorld
 contract address: 0xac1e28ad93e0b7f9108fa1167a8a06585f663726`} />
 
-          <H4>使用账号1部署HelloWorld失败（委员不兼运维权限）</H4>
-          <CodeBlock language="bash" code={`[group:1]> deploy HelloWorld
+            <H4>使用账号1部署HelloWorld失败（委员不兼运维权限）</H4>
+            <CodeBlock language="bash" code={`[group:1]> deploy HelloWorld
 permission denied`} />
 
-          <H4>撤销账号4的运维权限</H4>
-          <CodeBlock language="bash" code={`[group:1]> revokeOperator 0x283f5b859e34f7fd2cf136c07579dcc72423b1b2
+            <H4>撤销账号4的运维权限</H4>
+            <CodeBlock language="bash" code={`[group:1]> revokeOperator 0x283f5b859e34f7fd2cf136c07579dcc72423b1b2
 {
     "code":0,
     "msg":"success"
 }
 [group:1]> listOperators
 Empty set.`} />
+          </CollapsibleSection>
 
-          <h2 id="pc-table" className="text-xl font-black text-white tracking-tight mt-12 mb-4 pb-2 border-b border-white/10 scroll-mt-20">基于表的权限控制</h2>
+          <CollapsibleSection id="pc-table" title="基于表的权限控制">
+            <Note type="warning">由于系统默认无权限设置记录，任何账户均可使用权限设置功能。推荐使用grantPermissionManager（V2.5.0之前）或grantCommitteeMember（V2.5.0之后）指令设置链管理员账户，防止权限滥用。</Note>
 
-          <Note type="warning">由于系统默认无权限设置记录，任何账户均可使用权限设置功能。推荐使用grantPermissionManager（V2.5.0之前）或grantCommitteeMember（V2.5.0之后）指令设置链管理员账户，防止权限滥用。</Note>
+            <H3>操作内容</H3>
+            <UL>
+              <LI>授权账户为链管理员：使用grantPermissionManager命令</LI>
+              <LI>授权部署合约和创建用户表：使用grantDeployAndCreateManager命令</LI>
+              <LI>授权利用CNS部署合约：使用grantCNSManager命令</LI>
+              <LI>授权管理节点：使用grantNodeManager命令</LI>
+              <LI>授权修改系统参数：使用grantSysConfigManager命令</LI>
+              <LI>授权账户写用户表：使用grantUserTableManager命令</LI>
+            </UL>
 
-          <H3>操作内容</H3>
-          <UL>
-            <LI>授权账户为链管理员：使用grantPermissionManager命令</LI>
-            <LI>授权部署合约和创建用户表：使用grantDeployAndCreateManager命令</LI>
-            <LI>授权利用CNS部署合约：使用grantCNSManager命令</LI>
-            <LI>授权管理节点：使用grantNodeManager命令</LI>
-            <LI>授权修改系统参数：使用grantSysConfigManager命令</LI>
-            <LI>授权账户写用户表：使用grantUserTableManager命令</LI>
-          </UL>
+            <H3>环境配置</H3>
+            <P>配置并启动FISCO BCOS 2.0区块链节点和控制台，请参考安装文档。</P>
 
-          <H3>环境配置</H3>
-          <P>配置并启动FISCO BCOS 2.0区块链节点和控制台，请参考安装文档。</P>
+            <H3>权限控制工具</H3>
+            <Table
+              headers={['命令名称', '命令参数', '功能']}
+              rows={[
+                ['grantPermissionManager', 'address', '授权账户的链管理员权限(V2.5.0之前)'],
+                ['revokePermissionManager', 'address', '撤销账户的链管理员权限(V2.5.0之前)'],
+                ['listPermissionManager', '', '查询拥有链管理员权限的账户列表'],
+                ['grantDeployAndCreateManager', 'address', '授权账户的部署合约和创建用户表权限'],
+                ['revokeDeployAndCreateManager', 'address', '撤销账户的部署合约和创建用户表权限'],
+                ['listDeployAndCreateManager', '', '查询拥有部署合约和创建用户表权限的账户列表'],
+                ['grantNodeManager', 'address', '授权账户的节点管理权限'],
+                ['revokeNodeManager', 'address', '撤销账户的节点管理权限'],
+                ['listNodeManager', '', '查询拥有节点管理的账户列表'],
+                ['grantCNSManager', 'address', '授权账户的使用CNS权限'],
+                ['revokeCNSManager', 'address', '撤销账户的使用CNS权限'],
+                ['listCNSManager', '', '查询拥有使用CNS的账户列表'],
+                ['grantSysConfigManager', 'address', '授权账户的修改系统参数权限'],
+                ['revokeSysConfigManager', 'address', '撤销账户的修改系统参数权限'],
+                ['listSysConfigManager', '', '查询拥有修改系统参数的账户列表'],
+                ['grantUserTableManager', 'table_name address', '授权账户对用户表的写权限'],
+                ['revokeUserTableManager', 'table_name address', '撤销账户对用户表的写权限'],
+                ['listUserTableManager', 'table_name', '查询拥有对用户表写权限的账号列表'],
+              ]}
+            />
 
-          <H3>权限控制工具</H3>
-          <Table
-            headers={['命令名称', '命令参数', '功能']}
-            rows={[
-              ['grantPermissionManager', 'address', '授权账户的链管理员权限(V2.5.0之前)'],
-              ['revokePermissionManager', 'address', '撤销账户的链管理员权限(V2.5.0之前)'],
-              ['listPermissionManager', '', '查询拥有链管理员权限的账户列表'],
-              ['grantDeployAndCreateManager', 'address', '授权账户的部署合约和创建用户表权限'],
-              ['revokeDeployAndCreateManager', 'address', '撤销账户的部署合约和创建用户表权限'],
-              ['listDeployAndCreateManager', '', '查询拥有部署合约和创建用户表权限的账户列表'],
-              ['grantNodeManager', 'address', '授权账户的节点管理权限'],
-              ['revokeNodeManager', 'address', '撤销账户的节点管理权限'],
-              ['listNodeManager', '', '查询拥有节点管理的账户列表'],
-              ['grantCNSManager', 'address', '授权账户的使用CNS权限'],
-              ['revokeCNSManager', 'address', '撤销账户的使用CNS权限'],
-              ['listCNSManager', '', '查询拥有使用CNS的账户列表'],
-              ['grantSysConfigManager', 'address', '授权账户的修改系统参数权限'],
-              ['revokeSysConfigManager', 'address', '撤销账户的修改系统参数权限'],
-              ['listSysConfigManager', '', '查询拥有修改系统参数的账户列表'],
-              ['grantUserTableManager', 'table_name address', '授权账户对用户表的写权限'],
-              ['revokeUserTableManager', 'table_name address', '撤销账户对用户表的写权限'],
-              ['listUserTableManager', 'table_name', '查询拥有对用户表写权限的账号列表'],
-            ]}
-          />
-
-          <H3>权限控制示例账户</H3>
-          <P>生成三个PKCS12格式的账户文件：</P>
-          <CodeBlock language="bash" code={`# 账户1
+            <H3>权限控制示例账户</H3>
+            <P>生成三个PKCS12格式的账户文件：</P>
+            <CodeBlock language="bash" code={`# 账户1
 0x2c7f31d22974d5b1b2d6d5c359e81e91ee656252.p12
 # 账户2
 0x7fc8335fec9da5f84e60236029bb4a64a469a021.p12
 # 账户3
 0xd86572ad4c92d4598852e2f34720a865dd4fc3dd.p12`} />
-          <P>分别以三个账户登录控制台：</P>
-          <CodeBlock language="bash" code={`$ ./start.sh 1 -p12 accounts/0x2c7f31d22974d5b1b2d6d5c359e81e91ee656252.p12
+            <P>分别以三个账户登录控制台：</P>
+            <CodeBlock language="bash" code={`$ ./start.sh 1 -p12 accounts/0x2c7f31d22974d5b1b2d6d5c359e81e91ee656252.p12
 $ ./start.sh 1 -p12 accounts/0x7fc8335fec9da5f84e60236029bb4a64a469a021.p12
 $ ./start.sh 1 -p12 accounts/0xd86572ad4c92d4598852e2f34720a865dd4fc3dd.p12`} />
 
-          <H3>授权账户为链管理员</H3>
-          <CodeBlock language="bash" code={`[group:1]> grantPermissionManager 0x2c7f31d22974d5b1b2d6d5c359e81e91ee656252
+            <H3>授权账户为链管理员</H3>
+            <CodeBlock language="bash" code={`[group:1]> grantPermissionManager 0x2c7f31d22974d5b1b2d6d5c359e81e91ee656252
 {
     "code":0,
     "msg":"success"
@@ -394,9 +424,9 @@ $ ./start.sh 1 -p12 accounts/0xd86572ad4c92d4598852e2f34720a865dd4fc3dd.p12`} />
 | 0x2c7f31d22974d5b1b2d6d5c359e81e91ee656252  |                      1                      |
 ---------------------------------------------------------------------------------------------`} />
 
-          <H3>授权部署合约和创建用户表</H3>
-          <P>通过账户1授权账户2可以部署合约和创建用户表：</P>
-          <CodeBlock language="bash" code={`[group:1]> grantDeployAndCreateManager 0x7fc8335fec9da5f84e60236029bb4a64a469a021
+            <H3>授权部署合约和创建用户表</H3>
+            <P>通过账户1授权账户2可以部署合约和创建用户表：</P>
+            <CodeBlock language="bash" code={`[group:1]> grantDeployAndCreateManager 0x7fc8335fec9da5f84e60236029bb4a64a469a021
 {
     "code":0,
     "msg":"success"
@@ -406,30 +436,30 @@ $ ./start.sh 1 -p12 accounts/0xd86572ad4c92d4598852e2f34720a865dd4fc3dd.p12`} />
 |                   address                   |                 enable_num                  |
 | 0x7fc8335fec9da5f84e60236029bb4a64a469a021  |                      2                      |
 ---------------------------------------------------------------------------------------------`} />
-          <P>登录账户2的控制台，部署TableTest合约并创建用户表t_test：</P>
-          <CodeBlock language="bash" code={`[group:1]> deploy TableTest.sol
+            <P>登录账户2的控制台，部署TableTest合约并创建用户表t_test：</P>
+            <CodeBlock language="bash" code={`[group:1]> deploy TableTest.sol
 contract address:0xfe649f510e0ca41f716e7935caee74db993e9de8
 
 [group:1]> call TableTest.sol 0xfe649f510e0ca41f716e7935caee74db993e9de8 create
 transaction hash:0x67ef80cf04d24c488d5f25cc3dc7681035defc82d07ad983fbac820d7db31b5b`} />
-          <P>账户3部署合约失败：</P>
-          <CodeBlock language="bash" code={`[group:1]> deploy TableTest.sol
+            <P>账户3部署合约失败：</P>
+            <CodeBlock language="bash" code={`[group:1]> deploy TableTest.sol
 {
     "code":-50000,
     "msg":"permission denied"
 }`} />
 
-          <H3>授权利用CNS部署合约</H3>
-          <Note type="note">deployByCNS命令同时需要部署合约和使用CNS的权限，callByCNS和queryCNS命令不受权限控制。</Note>
-          <Table
-            headers={['命令', '说明']}
-            rows={[
-              ['deployByCNS', '利用CNS部署合约，需要部署合约和CNS权限'],
-              ['callByCNS', '利用CNS调用合约，不受权限控制'],
-              ['queryCNS', '查询CNS信息，不受权限控制'],
-            ]}
-          />
-          <CodeBlock language="bash" code={`[group:1]> grantCNSManager 0x7fc8335fec9da5f84e60236029bb4a64a469a021
+            <H3>授权利用CNS部署合约</H3>
+            <Note type="note">deployByCNS命令同时需要部署合约和使用CNS的权限，callByCNS和queryCNS命令不受权限控制。</Note>
+            <Table
+              headers={['命令', '说明']}
+              rows={[
+                ['deployByCNS', '利用CNS部署合约，需要部署合约和CNS权限'],
+                ['callByCNS', '利用CNS调用合约，不受权限控制'],
+                ['queryCNS', '查询CNS信息，不受权限控制'],
+              ]}
+            />
+            <CodeBlock language="bash" code={`[group:1]> grantCNSManager 0x7fc8335fec9da5f84e60236029bb4a64a469a021
 {
     "code":0,
     "msg":"success"
@@ -452,16 +482,16 @@ contract address:0x24f902ff362a01335db94b693edc769ba6226ff7
     "msg":"permission denied"
 }`} />
 
-          <H3>授权管理节点</H3>
-          <Table
-            headers={['命令', '说明']}
-            rows={[
-              ['addSealer', '将节点设置为共识节点，需要节点管理权限'],
-              ['addObserver', '将节点设置为观察者节点，需要节点管理权限'],
-              ['removeNode', '将节点设置为游离节点，需要节点管理权限'],
-            ]}
-          />
-          <CodeBlock language="bash" code={`[group:1]> grantNodeManager 0x7fc8335fec9da5f84e60236029bb4a64a469a021
+            <H3>授权管理节点</H3>
+            <Table
+              headers={['命令', '说明']}
+              rows={[
+                ['addSealer', '将节点设置为共识节点，需要节点管理权限'],
+                ['addObserver', '将节点设置为观察者节点，需要节点管理权限'],
+                ['removeNode', '将节点设置为游离节点，需要节点管理权限'],
+              ]}
+            />
+            <CodeBlock language="bash" code={`[group:1]> grantNodeManager 0x7fc8335fec9da5f84e60236029bb4a64a469a021
 {
     "code":0,
     "msg":"success"
@@ -481,15 +511,15 @@ contract address:0x24f902ff362a01335db94b693edc769ba6226ff7
     "msg":"permission denied"
 }`} />
 
-          <H3>授权修改系统参数</H3>
-          <Table
-            headers={['命令', '说明']}
-            rows={[
-              ['setSystemConfigByKey', '修改系统参数，需要系统参数管理权限'],
-              ['getSystemConfigByKey', '查询系统参数，不受权限控制'],
-            ]}
-          />
-          <CodeBlock language="bash" code={`[group:1]> grantSysConfigManager 0x7fc8335fec9da5f84e60236029bb4a64a469a021
+            <H3>授权修改系统参数</H3>
+            <Table
+              headers={['命令', '说明']}
+              rows={[
+                ['setSystemConfigByKey', '修改系统参数，需要系统参数管理权限'],
+                ['getSystemConfigByKey', '查询系统参数，不受权限控制'],
+              ]}
+            />
+            <CodeBlock language="bash" code={`[group:1]> grantSysConfigManager 0x7fc8335fec9da5f84e60236029bb4a64a469a021
 {
     "code":0,
     "msg":"success"
@@ -509,8 +539,8 @@ contract address:0x24f902ff362a01335db94b693edc769ba6226ff7
     "msg":"permission denied"
 }`} />
 
-          <H3>授权账户写用户表</H3>
-          <CodeBlock language="bash" code={`# 通过账户1授权账户3写用户表t_test
+            <H3>授权账户写用户表</H3>
+            <CodeBlock language="bash" code={`# 通过账户1授权账户3写用户表t_test
 [group:1]> grantUserTableManager t_test 0xd86572ad4c92d4598852e2f34720a865dd4fc3dd
 {
     "code":0,
@@ -541,7 +571,8 @@ transaction hash:0xc4d261026851c3338f1a64ecd4712e5fc2a028c108363181725f07448b986
 }
 [group:1]> listUserTableManager t_test
 Empty set.`} />
-          <Note type="note">撤销后没有账户拥有对该表的写权限，因此对该表的写权限恢复初始状态，即所有账户均拥有写权限。</Note>
+            <Note type="note">撤销后没有账户拥有对该表的写权限，因此对该表的写权限恢复初始状态，即所有账户均拥有写权限。</Note>
+          </CollapsibleSection>
 
           <div className="mt-16 pt-8 border-t border-white/5 text-slate-600 text-xs space-y-2">
             <p>© Copyright DeSpace 2019. 本技术文档适用于DeSpace 2.x版本。</p>
