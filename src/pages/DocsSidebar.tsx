@@ -3,20 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 
 export const developNavItems = [
-  { id: 's1',       label: '1. 了解应用需求' },
-  { id: 's2',       label: '2. 设计与开发智能合约' },
+  { id: 's1',       label: '了解应用需求' },
+  { id: 's2',       label: '设计与开发智能合约' },
   { id: 's2-step1', label: '　第一步. 设计智能合约' },
   { id: 's2-step2', label: '　第二步. 开发源码' },
-  { id: 's3',       label: '3. 编译智能合约' },
-  { id: 's4',       label: '4. 创建区块链应用项目' },
+  { id: 's3',       label: '编译智能合约' },
+  { id: 's4',       label: '创建区块链应用项目' },
   { id: 's4-step1', label: '　第一步. 安装环境' },
   { id: 's4-step2', label: '　第二步. 创建Java工程' },
   { id: 's4-step3', label: '　第三步. 引入Java SDK' },
   { id: 's4-step4', label: '　第四步. 配置SDK证书' },
-  { id: 's5',       label: '5. 业务逻辑开发' },
+  { id: 's5',       label: '业务逻辑开发' },
   { id: 's5-step1', label: '　第一步. 引入合约Java类' },
   { id: 's5-step2', label: '　第二步. 开发业务逻辑' },
-  { id: 's6',       label: '6. 运行应用' },
+  { id: 's6',       label: '运行应用' },
 ];
 
 export const javaNavItems = [
@@ -34,13 +34,13 @@ export const javaNavItems = [
 
 export const keyConceptsNavItems = [
   { id: 'blockchain',            label: '区块链是什么' },
-  { id: 'blockchain-ledger',     label: '　账本' },
-  { id: 'blockchain-consensus',  label: '　共识机制' },
-  { id: 'blockchain-contract',   label: '　智能合约' },
+  { id: 'blockchain-ledger',     label: '　1. 账本' },
+  { id: 'blockchain-consensus',  label: '　2. 共识机制' },
+  { id: 'blockchain-contract',   label: '　3. 智能合约' },
   { id: 'consortium',            label: '联盟链概念分析' },
-  { id: 'consortium-perf',       label: '　性能' },
-  { id: 'consortium-security',   label: '　安全性' },
-  { id: 'consortium-governance', label: '　治理与监管' },
+  { id: 'consortium-perf',       label: '　1. 性能' },
+  { id: 'consortium-security',   label: '　2. 安全性' },
+  { id: 'consortium-governance', label: '　3. 治理与监管' },
 ];
 
 const configSubPages = [

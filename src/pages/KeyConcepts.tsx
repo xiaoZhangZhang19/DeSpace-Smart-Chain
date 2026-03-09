@@ -124,7 +124,7 @@ export default function KeyConcepts() {
           <P>区块链是一种由多方共同维护、使用密码学保证传输和访问安全、能够实现数据一致存储、防止篡改、防止抵赖的记账技术，也称为分布式账本技术（Distributed Ledger Technology）。</P>
           <P>与传统中心化数据库不同，区块链网络中不存在单一的权威节点，所有参与节点共同维护一份账本副本，并通过共识算法保证各节点之间数据的一致性。数据一旦写入区块链，便具有不可篡改的特性，从而为多方业务协同提供了可信的技术基础。</P>
 
-          <H3 id="blockchain-ledger">账本</H3>
+          <H3 id="blockchain-ledger">1. 账本</H3>
           <P>区块链的账本由一系列有序的区块（Block）组成，每个区块包含若干交易记录，并通过密码学哈希链接到上一个区块，形成不可篡改的链式结构。</P>
 
           <H4>核心数据结构</H4>
@@ -155,7 +155,7 @@ export default function KeyConcepts() {
   ]
 }`} />
 
-          <H3 id="blockchain-consensus">共识机制</H3>
+          <H3 id="blockchain-consensus">2. 共识机制</H3>
           <P>共识机制是区块链网络中各节点就账本状态达成一致的核心算法。在没有中心化权威机构的情况下，共识算法保证了分布式节点之间能够对交易顺序和执行结果产生相同的认知。</P>
 
           <H4>节点类型</H4>
@@ -187,7 +187,7 @@ export default function KeyConcepts() {
           </UL>
           <Note type="tip">生产环境推荐使用 PBFT 或 rPBFT，以确保在节点出现故障或被攻击时系统仍能正常运行。Raft 仅适用于节点完全可信的测试或私有部署场景。</Note>
 
-          <H3 id="blockchain-contract">智能合约</H3>
+          <H3 id="blockchain-contract">3. 智能合约</H3>
           <P>智能合约（Smart Contract）是运行在区块链上的自执行程序，合约代码及执行结果均存储在链上，任何参与方都无法单方面篡改。DeSpace 兼容以太坊 EVM，支持使用 Solidity 语言编写智能合约。</P>
 
           <H4>智能合约生命周期</H4>
@@ -208,7 +208,7 @@ export default function KeyConcepts() {
           <P>联盟链（Consortium Blockchain）是一种由多个机构共同参与、对特定群体开放的区块链形态，介于完全开放的公链与完全封闭的私链之间。DeSpace 作为联盟链平台，在设计上针对企业级场景进行了深度优化，在性能、安全性和治理三个维度均有鲜明特色。</P>
           <P>相较于公链（如以太坊主网），联盟链的参与节点均经过身份认证，网络规模可控，因此能够采用更高效的共识算法，实现更高的交易吞吐量和更低的确认延迟，同时在数据隐私保护和监管合规方面具有天然优势。</P>
 
-          <H3 id="consortium-perf">性能</H3>
+          <H3 id="consortium-perf">1. 性能</H3>
           <P>性能是企业级区块链平台的核心指标之一。DeSpace 在设计之初便将高性能作为核心目标，通过多项技术手段实现了业界领先的交易处理能力。</P>
 
           <H4>性能指标</H4>
@@ -227,7 +227,7 @@ export default function KeyConcepts() {
           </UL>
           <Note type="note">并行交易执行需要在合约开发阶段预先声明交易的冲突变量，开发者需参考 DeSpace 并行合约开发文档进行适配。</Note>
 
-          <H3 id="consortium-security">安全性</H3>
+          <H3 id="consortium-security">2. 安全性</H3>
           <P>企业级区块链平台必须提供全面的安全保障，覆盖网络接入、数据传输、存储以及权限控制等各个层面。DeSpace 构建了多层次的安全防护体系。</P>
 
           <H4>准入机制</H4>
@@ -250,7 +250,7 @@ export default function KeyConcepts() {
             <LI><strong className="text-white">隐私合约</strong>：支持可选的 WeDPR 隐私保护组件，提供零知识证明等高级隐私计算能力，在不暴露原始数据的前提下完成业务逻辑验证。</LI>
           </UL>
 
-          <H3 id="consortium-governance">治理与监管</H3>
+          <H3 id="consortium-governance">3. 治理与监管</H3>
           <P>联盟链的核心价值在于多方协同治理，DeSpace 提供了完整的链上治理框架，支持联盟成员共同决策、动态管理网络成员，并为监管机构提供必要的审计接口。</P>
 
           <H4>联盟链治理</H4>

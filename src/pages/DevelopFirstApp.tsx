@@ -63,20 +63,20 @@ const IC = ({ children }: { children: React.ReactNode }) => (
 
 const navItems = [
   { id: 'intro',    label: '开发第一个区块链应用' },
-  { id: 's1',       label: '1. 了解应用需求' },
-  { id: 's2',       label: '2. 设计与开发智能合约' },
+  { id: 's1',       label: '了解应用需求' },
+  { id: 's2',       label: '设计与开发智能合约' },
   { id: 's2-step1', label: '　第一步. 设计智能合约' },
   { id: 's2-step2', label: '　第二步. 开发源码' },
-  { id: 's3',       label: '3. 编译智能合约' },
-  { id: 's4',       label: '4. 创建区块链应用项目' },
+  { id: 's3',       label: '编译智能合约' },
+  { id: 's4',       label: '创建区块链应用项目' },
   { id: 's4-step1', label: '　第一步. 安装环境' },
   { id: 's4-step2', label: '　第二步. 创建Java工程' },
   { id: 's4-step3', label: '　第三步. 引入Java SDK' },
   { id: 's4-step4', label: '　第四步. 配置SDK证书' },
-  { id: 's5',       label: '5. 业务逻辑开发' },
+  { id: 's5',       label: '业务逻辑开发' },
   { id: 's5-step1', label: '　第一步. 引入合约Java类' },
   { id: 's5-step2', label: '　第二步. 开发业务逻辑' },
-  { id: 's6',       label: '6. 运行应用' },
+  { id: 's6',       label: '运行应用' },
 ];
 
 const assetSol = `pragma solidity ^0.4.24;
@@ -584,7 +584,7 @@ export default function Documentation() {
           <P>本教程要求用户熟悉Linux操作环境，具备Java开发的基本技能，能够使用Gradle工具，熟悉Solidity语法。</P>
           <P>如果您还未搭建区块链网络，或未下载控制台，请先走完教程搭建第一个区块链网络，再回到本教程。</P>
 
-          <H2 id="s1">1. 了解应用需求</H2>
+          <H2 id="s1">了解应用需求</H2>
           <P>区块链天然具有防篡改，可追溯等特性，这些特性决定其更容易受金融领域的青睐。本示例中，将会提供一个简易的资产管理的开发示例，并最终实现以下功能：</P>
           <UL>
             <LI>能够在区块链上进行资产注册</LI>
@@ -592,7 +592,7 @@ export default function Documentation() {
             <LI>可以查询账户的资产金额</LI>
           </UL>
 
-          <H2 id="s2">2. 设计与开发智能合约</H2>
+          <H2 id="s2">设计与开发智能合约</H2>
           <P>在区块链上进行应用开发时，结合业务需求，首先需要设计对应的智能合约，确定合约需要储存的数据，在此基础上确定智能合约对外提供的接口，最后给出各个接口的具体实现。</P>
 
           <H3 id="s2-step1">第一步. 设计智能合约</H3>
@@ -643,7 +643,7 @@ vi Asset.sol
           <P><IC>Asset.sol</IC>所引用的<IC>Table.sol</IC>已在<IC>~/fisco/console/contracts/solidity</IC>目录下。该系统合约文件中的接口由DeSpace底层实现。当业务合约需要操作CRUD接口时，均需要引入该接口合约文件。Table.sol 合约详细接口参考相关文档。</P>
           <P>运行<IC>ls</IC>命令，确保<IC>Asset.sol</IC>和<IC>Table.sol</IC>在目录<IC>~/fisco/console/contracts/solidity</IC>下。</P>
 
-          <H2 id="s3">3. 编译智能合约</H2>
+          <H2 id="s3">编译智能合约</H2>
           <P><IC>.sol</IC>的智能合约需要编译成ABI和BIN文件才能部署至区块链网络上。有了这两个文件即可凭借Java SDK进行合约部署和调用。但这种调用方式相对繁琐，需要用户根据合约ABI来传参和解析结果。为此，控制台提供的编译工具不仅可以编译出ABI和BIN文件，还可以自动生成一个与编译的智能合约同名的合约Java类。这个Java类是根据ABI生成的，帮助用户解析好了参数，提供同名的方法。当应用需要部署和调用合约时，可以调用该合约类的对应方法，传入指定参数即可。使用这个合约Java类来开发应用，可以极大简化用户的代码。</P>
           <CodeBlock language="bash" code={`# 创建工作目录~/fisco
 mkdir -p ~/fisco
@@ -683,7 +683,7 @@ bash sol2java.sh -p org.fisco.bcos.asset.contract
           <CodeBlock language="java" code={assetJavaIface} />
           <P>其中load与deploy函数用于构造Asset对象，其他接口分别用来调用对应的solidity合约的接口。</P>
 
-          <H2 id="s4">4. 创建区块链应用项目</H2>
+          <H2 id="s4">创建区块链应用项目</H2>
 
           <H3 id="s4-step1">第一步. 安装环境</H3>
           <P>首先，我们需要安装JDK以及集成开发环境</P>
@@ -790,7 +790,7 @@ $ cp -r nodes/127.0.0.1/sdk/* asset-app/src/main/resources/conf`} />
 
           <div className="my-4 flex justify-center"><img src="https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/_images/copy_cert.png" alt="拷贝节点证书" className="max-w-full rounded-sm border border-white/10 block" /></div>
 
-          <H2 id="s5">5. 业务逻辑开发</H2>
+          <H2 id="s5">业务逻辑开发</H2>
           <P>我们已经介绍了如何在自己的项目中引入以及配置Java SDK，本节介绍如何通过Java程序调用合约，同样以示例的资产管理说明。</P>
 
           <H3 id="s5-step1">第一步. 将3编译好的Java合约引入项目中</H3>
@@ -987,7 +987,7 @@ jar {
 |-- tool
     |-- asset_run.sh // 项目运行脚本`} />
 
-          <H2 id="s6">6. 运行应用</H2>
+          <H2 id="s6">运行应用</H2>
           <P>至此我们已经介绍使用区块链开发资产管理应用的所有流程并实现了功能，接下来可以运行项目，测试功能是否正常。</P>
           <H4>编译</H4>
           <CodeBlock language="bash" code={`# 切换到项目目录
